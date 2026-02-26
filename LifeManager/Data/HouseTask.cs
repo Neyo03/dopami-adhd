@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.Text.Json.Serialization;
 
 namespace LifeManager.Data;
 
@@ -20,7 +19,7 @@ public class HouseTask
     
     public List<Tag> Tags { get; set; } = new();
     
-    public int? UserAssignedId { get; set; }
-    
-    public int? CompletedById { get; set; }
+    public User? UserAssigned { get; set; } = new();
+
+    public int XpToEarn { get; set; } = 0;
 }

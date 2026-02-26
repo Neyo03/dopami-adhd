@@ -121,7 +121,6 @@ public class HouseService(IDbContextFactory<AppDbContext> factory)
         return home;
     }
     
-    
     public async Task ToggleTaskAsync(HouseTask toggleTask)
     {
         await using var context = await factory.CreateDbContextAsync();
@@ -129,5 +128,16 @@ public class HouseService(IDbContextFactory<AppDbContext> factory)
         await context.HouseTasks
             .Where(task => task.Id == toggleTask.Id)
             .ExecuteUpdateAsync(setters => setters.SetProperty(t => t.IsDone, !toggleTask.IsDone));
+    }
+    
+    public async Task CreateTaskCompletionAsync(TaskCompletion taskCompletion)
+    {
+        await using var context = await factory.CreateDbContextAsync();
+        
+        context.Entry(taskCompletion.HouseTask).State = EntityState.Unchanged;
+        context.Entry(taskCompletion.CompletedBy).State = EntityState.Unchanged;
+        
+        context.TaskCompletions.Add(taskCompletion);
+        await context.SaveChangesAsync();
     }
 }

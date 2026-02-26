@@ -27,9 +27,11 @@ builder.Services.AddDbContextFactory<AppDbContext>(options =>
 
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<HouseService>();
+builder.Services.AddScoped<LevelingService>();
 builder.Services.AddScoped<TagService>();
 builder.Services.AddScoped<TagStateService>();
 builder.Services.AddScoped<TagModalStateService>();
+
 
 var app = builder.Build();
 app.UseHttpsRedirection();

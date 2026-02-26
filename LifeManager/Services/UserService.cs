@@ -1,5 +1,6 @@
 ﻿using System.Security.Claims;
 using LifeManager.Data;
+using LifeManager.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace LifeManager.Services;
@@ -38,5 +39,20 @@ public class UserService(IDbContextFactory<AppDbContext> factory, IHttpContextAc
             ?.Value);
         
         return await context.Users.Include(user => user.Home).FirstOrDefaultAsync(user => user.Id == userId);
+    }
+    
+    public async Task UpdateTotalXpUser(User user)
+    {
+        await using var context = await factory.CreateDbContextAsync();
+        
+        var totalXpTasks = await context.TaskCompletions
+            .GetCompletedTaskByUser(user)!
+            .SumAsync(completion => completion.XpEarned);
+   
+
+        await context.Users
+            .Where(userToUpdate => userToUpdate.Id == user.Id)
+            .ExecuteUpdateAsync(setters => setters.SetProperty(u => u.TotalXp, totalXpTasks));
+        
     }
 }

@@ -62,9 +62,6 @@ namespace LifeManager.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("CompletedById")
-                        .HasColumnType("integer");
-
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("text");
@@ -85,9 +82,14 @@ namespace LifeManager.Migrations
                     b.Property<int?>("UserAssignedId")
                         .HasColumnType("integer");
 
+                    b.Property<int>("XpToEarn")
+                        .HasColumnType("integer");
+
                     b.HasKey("Id");
 
                     b.HasIndex("RoomId");
+
+                    b.HasIndex("UserAssignedId");
 
                     b.ToTable("HouseTasks");
                 });
@@ -140,6 +142,35 @@ namespace LifeManager.Migrations
                     b.ToTable("Tags");
                 });
 
+            modelBuilder.Entity("LifeManager.Data.TaskCompletion", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime?>("CompletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("CompletedById")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("HouseTaskId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("XpEarned")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CompletedById");
+
+                    b.HasIndex("HouseTaskId");
+
+                    b.ToTable("TaskCompletions");
+                });
+
             modelBuilder.Entity("LifeManager.Data.User", b =>
                 {
                     b.Property<int>("Id")
@@ -156,7 +187,7 @@ namespace LifeManager.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int?>("HomeId")
+                    b.Property<int>("HomeId")
                         .HasColumnType("integer");
 
                     b.Property<string>("Lastname")
@@ -166,6 +197,9 @@ namespace LifeManager.Migrations
                     b.Property<string>("Password")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<int>("TotalXp")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Username")
                         .IsRequired()
@@ -201,7 +235,13 @@ namespace LifeManager.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("LifeManager.Data.User", "UserAssigned")
+                        .WithMany()
+                        .HasForeignKey("UserAssignedId");
+
                     b.Navigation("Room");
+
+                    b.Navigation("UserAssigned");
                 });
 
             modelBuilder.Entity("LifeManager.Data.Room", b =>
@@ -226,11 +266,32 @@ namespace LifeManager.Migrations
                     b.Navigation("Home");
                 });
 
+            modelBuilder.Entity("LifeManager.Data.TaskCompletion", b =>
+                {
+                    b.HasOne("LifeManager.Data.User", "CompletedBy")
+                        .WithMany()
+                        .HasForeignKey("CompletedById")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("LifeManager.Data.HouseTask", "HouseTask")
+                        .WithMany()
+                        .HasForeignKey("HouseTaskId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CompletedBy");
+
+                    b.Navigation("HouseTask");
+                });
+
             modelBuilder.Entity("LifeManager.Data.User", b =>
                 {
                     b.HasOne("LifeManager.Data.Home", "Home")
                         .WithMany("Users")
-                        .HasForeignKey("HomeId");
+                        .HasForeignKey("HomeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Home");
                 });

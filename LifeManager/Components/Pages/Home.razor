@@ -4,10 +4,14 @@
 @inject HouseService HouseService 
 @inject UserService UserService 
 @inject TagStateService TagState 
+@inject LevelingService LevelingService 
 @rendermode InteractiveServer
 
+<div class="flex justify-center items-center w-full flex-col mb-5">
+    <h1 class="text-5xl">Home Cleaner</h1>
+    <small>Une micro-tâche à la fois, sans pression</small>
+</div>
 
-<h1 class="text-xl mb-3">Ma Maison</h1>
 
 @if (_rooms == null || _roomsWithTasks == null)
 {
@@ -15,36 +19,65 @@
 }
 else
 {
-    <div class="card border w-1/2">
-        <div class="rounded-t-xl bg-secondary-content p-3">
-            <h2 class="card-title flex justify-between items-center text-base-200">
-                <div class="flex flex-col w-1/2">
-                    Tâches
-                    <small class="text-primary-content/50 text-xs">@_countDoneTasks / @_countTasks accomplies</small>
+    <div class="card border w-1/2 p-5">
+        <div class="rounded-t-xl mb-5 mt-5">
+            <h2 class="card-title flex justify-between items-center">
+                <div class="w-1/2 flex flex-row gap-1 items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18 9 11.25l4.306 4.306a11.95 11.95 0 0 1 5.814-5.518l2.74-1.22m0 0-5.94-2.281m5.94 2.28-2.28 5.941" />
+                    </svg>
+
+
+                    Ta progression
+                    @* <small class="text-primary-content/50 text-xs">@_countDoneTasks / @_countTasks accomplies</small> *@
+
                 </div>
+                
                 <div class="flex gap-1 items-center w-1/2 justify-end">
-                    <label class="input input-sm rounded-lg text-neutral-content w-2/3">
-                        <input type="search" required placeholder="Search" />
-                    </label>
-                    <small class="bg-base-100 ms-1 p-2 rounded-lg text-neutral-content shadow-xs text-xs cursor-pointer" 
-                           @onclick="OpenCreateDrawer">
-                        + Ajouter
-                    </small>
+                    <div class="badge badge-success">Niveau @_levelingUser!.Level</div>
+                    @* <label class="input input-sm rounded-lg text-neutral-content w-2/3"> *@
+                    @*     <input type="search" required placeholder="Search" /> *@
+                    @* </label> *@
+                    @* <small class="bg-base-100 ms-1 p-2 rounded-lg text-neutral-content shadow-xs text-xs cursor-pointer"  *@
+                    @*        @onclick="OpenCreateDrawer"> *@
+                    @*     + Ajouter *@
+                    @* </small> *@
                 </div>
             </h2>
         </div>
+        <div class="mt-5 ">
+            <p class="text-xs"> @_levelingUser!.CurrentLevelXp / @_levelingUser!.XpRequiredForNextLevel points</p>
+            <progress class="progress w-full" value="0" max="100"></progress>
+        </div>
         
-        <RoomTaskList 
-            Rooms="_roomsWithTasks" 
-            OnToggleTask="ToggleTask" 
+        <div class="flex flex-row justify-between items-center">
+            <div class="rounded-md p-5 flex flex-col items-center justify-center w-1/3 border border-warning bg-warning-content">
+                <svg class="w-6 h-6 mb-2 text-warning dark:text-warning" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                    <path stroke="currentColor" stroke-width="2" d="M11.083 5.104c.35-.8 1.485-.8 1.834 0l1.752 4.022a1 1 0 0 0 .84.597l4.463.342c.9.069 1.255 1.2.556 1.771l-3.33 2.723a1 1 0 0 0-.337 1.016l1.03 4.119c.214.858-.71 1.552-1.474 1.106l-3.913-2.281a1 1 0 0 0-1.008 0L7.583 20.8c-.764.446-1.688-.248-1.474-1.106l1.03-4.119A1 1 0 0 0 6.8 14.56l-3.33-2.723c-.698-.571-.342-1.702.557-1.771l4.462-.342a1 1 0 0 0 .84-.597l1.753-4.022Z"/>
+                </svg>
+
+                <span class="text-xs">Tâches</span>
+                <b class="text-lg">@_countTasks</b>
+
+            </div>
+            
+        </div>
+        
+       
+        
+        
+        
+        <RoomTaskList
+            Rooms="_roomsWithTasks"
+            OnToggleTask="ToggleTask"
             OnEditTask="OpenEditDrawer" />
-        <div class="divider cursor-pointer link text-xs" @onclick="ToggleDoneTasksSection">Tâches terminées 
+        <div class="divider cursor-pointer link text-xs" @onclick="ToggleDoneTasksSection">Tâches terminées
         </div>
         @if (_isOpenDoneTask)
         {
-            <RoomTaskList 
-                Rooms="_roomsWithDoneTasks" 
-                OnToggleTask="ToggleTask" 
+            <RoomTaskList
+                Rooms="_roomsWithDoneTasks"
+                OnToggleTask="ToggleTask"
                 OnEditTask="OpenEditDrawer" />
         }
     </div>
