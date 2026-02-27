@@ -1,6 +1,7 @@
 ﻿using System.Security.Claims;
 using LifeManager.Data;
 using LifeManager.Extensions;
+using LifeManager.Model;
 using Microsoft.EntityFrameworkCore;
 
 namespace LifeManager.Services;
@@ -31,27 +32,33 @@ public class UserService(IDbContextFactory<AppDbContext> factory, IHttpContextAc
         return true;
     }
     
-    public async Task<User?> GetAuthenticatedUserAsync()
+    public async Task<UserDto?> GetAuthenticatedUserAsync()
     {  
         await using var context = await factory.CreateDbContextAsync();
 
         int userId =  Convert.ToInt32(httpContext.HttpContext?.User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier)
             ?.Value);
         
-        return await context.Users.Include(user => user.Home).FirstOrDefaultAsync(user => user.Id == userId);
+        return await context.Users.Select(user => new UserDto()
+        {
+            UserId = user.Id,
+            Username = user.Username,
+            TotalXp = user.TotalXp,
+            HomeId = user.Home.Id
+        }).FirstOrDefaultAsync(user => user.UserId == userId);
     }
     
-    public async Task UpdateTotalXpUser(User user)
+    public async Task UpdateTotalXpUser(int userId)
     {
         await using var context = await factory.CreateDbContextAsync();
         
         var totalXpTasks = await context.TaskCompletions
-            .GetCompletedTaskByUser(user)!
+            .GetCompletedTaskByUser(userId)!
             .SumAsync(completion => completion.XpEarned);
    
 
         await context.Users
-            .Where(userToUpdate => userToUpdate.Id == user.Id)
+            .Where(userToUpdate => userToUpdate.Id == userId)
             .ExecuteUpdateAsync(setters => setters.SetProperty(u => u.TotalXp, totalXpTasks));
         
     }

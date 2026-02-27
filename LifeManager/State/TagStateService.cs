@@ -1,4 +1,5 @@
 ﻿using LifeManager.Data;
+using LifeManager.Model;
 using LifeManager.Services;
 
 namespace LifeManager.State;
@@ -9,7 +10,7 @@ public class TagStateService(TagService tagService)
     
     public event Action? OnChange;
     
-    public async Task InitializeAsync(User user)
+    public async Task InitializeAsync(UserDto user)
     {
         if (Tags.Count == 0)
         {
@@ -22,9 +23,9 @@ public class TagStateService(TagService tagService)
         await tagService.AddTagAsync(tag);
     }
 
-    public async Task RefreshAsync(User user)
+    public async Task RefreshAsync(UserDto user)
     {
-        var fetchedTags = await tagService.GetTagsAsync(user);
+        var fetchedTags = await tagService.GetTagsAsync(user.HomeId);
         Tags = fetchedTags ?? new();
         NotifyStateChanged();
     }

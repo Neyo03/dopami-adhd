@@ -1,16 +1,13 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.Text.Json.Serialization;
+using LifeManager.Data;
 
-namespace LifeManager.Data;
+namespace LifeManager.Model;
 
-public class TaskCompletion
+public class TaskCompletionModel
 {
-    public int Id { get; set; }
+    public int TaskCompletionId { get; set; }
     public int HouseTaskId { get; set; }
     public int CompletedById { get; set; }
-    public User CompletedBy { get; set; }
-    public HouseTask HouseTask { get; set; }
     public int XpEarned { get; set; } = 0;
     public DateTime? CompletedAt { get; set; }
-
 }

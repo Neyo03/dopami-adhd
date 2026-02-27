@@ -1,27 +1,18 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using LifeManager.Data;
+using LifeManager.Model;
 
 namespace LifeManager.Extensions;
 
 public static class HomeQueryExtensions
 {
-    public static IQueryable<Room> GetRoomsByHome(this IQueryable<Room> query, User user)
+    public static IQueryable<Room> GetRoomsByHome(this IQueryable<Room> query, int homeId)
     {
-        if (user.Home is null)
-        {
-            return query.Where(r => false);
-        }
-        
-        return query.Where(room => room.Home!.Id == user.Home.Id);
+        return query.Where(room => room.Home!.Id == homeId);
     }
     
-    public static IQueryable<HouseTask>? GetTasksByHome(this IQueryable<HouseTask> query, User user)
+    public static IQueryable<HouseTask>? GetTasksByHome(this IQueryable<HouseTask> query, int homeId)
     {
-        if (user.Home is null)
-        {
-            return query.Where(r => false);
-        }
-        
-        return query.Where(task => task.Room.Home!.Id == user.Home.Id);
+        return query.Where(task => task.Room.Home!.Id == homeId);
     }
 }

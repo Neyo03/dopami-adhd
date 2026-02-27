@@ -1,7 +1,9 @@
-﻿@using LifeManager.Data
+﻿@using Humanizer
+@using LifeManager.Data
+@using LifeManager.Model
 @using Microsoft.IdentityModel.Tokens
 
-<div class="flex gap-10 items-start p-6">
+<div class="flex gap-10 items-start p-3 w-full">
     @{ int roomIndex = 0; }
     @if (Rooms.IsNullOrEmpty())
     {
@@ -9,26 +11,51 @@
     }
     @foreach (var room in Rooms)
     {
-        <div>
+        <div class="w-full">
             @if (roomIndex > 0)
             {
                 <div class="divider divider-horizontal"></div>
             }
-            <div>
-                <b>@room.Name</b>
+            <div class="w-full">
+                <b>@room.RoomName</b>
                 <div class="text-xs mt-1">
-                    <ul class="list">
-                        @foreach (var task in room.Tasks)
+                    <ul class="list w-full">
+                        @foreach (var task in room.ActiveTasks)
                         {
                             <li>
-                                <div class="flex justify-between items-center border-b border-base-content/50 p-2 min-w-1/2 max-w-3/4">
-                                    <div @key="task.Id">
-                                        <input type="checkbox" class="checkbox checkbox-xs mr-1" checked="@task.IsDone"
-                                               @onchange="() => OnToggleTask.InvokeAsync(task)"/>
+                                <div class="flex justify-between items-center border-b border-base-content/50 p-2 w-full">
+                                    <div @key="task.TaskId" class="flex gap-3 items-center">
+                                        @* <input type="checkbox" class="checkbox checkbox-xs mr-1" checked="@task.IsDone" *@
+                                        @*        @onchange="() => OnToggleTask.InvokeAsync(task)"/> *@
+                                        @if (task.AssignedUsername != null)
+                                        {
+                                            <button type="button" class="border rounded-full w-5 h-5 flex justify-center items-center text-center border-secondary text-secondary cursor-pointer text-xs " popovertarget="popoverassignuser-user-@task.TaskId" style="anchor-name:--anchor-user-@task.TaskId">
+                                               N
+                                            </button>
+                                        }
+                                        else
+                                        {
+                                            <button type="button" class="border border-dashed rounded-full w-5 h-5 flex justify-center items-center opacity-50 cursor-pointer " popovertarget="popoverassignuser-user-@task.TaskId" style="anchor-name:--anchor-user-@task.TaskId">
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+                                                </svg>
+                                            </button>
+                                        }
+                                        
+                                        <ul class="dropdown menu w-52 rounded-box bg-base-200 shadow-sm text-xs p-2" popover id="popoverassignuser-user-@task.TaskId" style="position-anchor:--anchor-user-@task.TaskId">
+                                            @foreach (var user in room.HomeUsers)
+                                            {
+                                                <li>
+                                                    <span @onclick="() => OnToggleAssignUser.InvokeAsync((task, user))" class="cursor-pointer relative flex items-center @(user.Username == task.AssignedUsername ? "bg-base-content/20" : "")"> <input class="radio checkbox-xs" type="checkbox" checked="@(user.Username == task.AssignedUsername)"> <span class=" avatar rounded-full  w-5 h-5 bg-base-content flex items-center justify-center text-base-100 text-xs">N</span> @user.Username</span>
+                                                </li>
+                                            }
+                                            
+                                        </ul>
+                                        
                                         @task.Title
                                         
                                         <p class="ml-6 text-xs text-neutral-content/80 break-all text-wrap ">
-                                            @task.Description
+                                            @task.Description.Truncate(15)
                                         </p>
                                     </div>
                                     <svg @onclick="() => OnEditTask.InvokeAsync(task)" class="cursor-pointer ml-2 w-5 h-5 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
@@ -46,7 +73,9 @@
 </div>
 
 @code {
-    [Parameter] public required List<Room> Rooms { get; set; }
-    [Parameter] public EventCallback<HouseTask> OnToggleTask { get; set; }
-    [Parameter] public EventCallback<HouseTask> OnEditTask { get; set; }
+    [Parameter] public required List<RoomDashboardDto> Rooms { get; set; }
+    [Parameter] public EventCallback<TaskDetailsDto> OnToggleTask { get; set; }
+    [Parameter] public EventCallback<TaskDetailsDto> OnEditTask { get; set; }
+    [Parameter] public EventCallback<(TaskDetailsDto, UserDto)> OnToggleAssignUser { get; set; }
+
 }

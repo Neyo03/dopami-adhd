@@ -29,7 +29,7 @@
 @code {
     public CreateRoomModel _model { get; set; } = new();
 
-    private User? _connectedUser;
+    private UserDto? _connectedUser;
     
     protected override async Task OnInitializedAsync()
     {
@@ -38,7 +38,7 @@
     
     private async Task AddRoom()
     {
-        if (_connectedUser?.Home == null) 
+        if (_connectedUser?.HomeId == null) 
         {
             return;
         }
@@ -46,7 +46,7 @@
         var room = new Room()
         {
             Name = _model.Name,
-            Home = _connectedUser.Home
+            HomeId = _connectedUser.HomeId
         };
      
         DbContext.Rooms.Add(room);

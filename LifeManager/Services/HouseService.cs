@@ -10,31 +10,88 @@ public class HouseService(IDbContextFactory<AppDbContext> factory)
 {
     
     // Récupérer les pièces et leurs tâches
-    public async Task<List<Room>> GetRoomsAsync(User user)
+    public async Task<List<Room>> GetRoomsAsync(int homeId)
     {
         await using var context = await factory.CreateDbContextAsync();
-        return await context.Rooms.GetRoomsByHome(user).ToListAsync();
+        return await context.Rooms.GetRoomsByHome(homeId).ToListAsync();
     }
     
-    // Récupérer les pièces et leurs tâches non terminées
-    public async Task<List<Room>> GetRoomsInprogressTasksAsync(User user)
+    public async Task<List<RoomDashboardDto>> GetRoomsInprogressTasksOptimizedAsync(int homeId)
     {
         await using var context = await factory.CreateDbContextAsync();
+        
         return await context.Rooms
-            .GetRoomsByHome(user)
+            .GetRoomsByHome(homeId)
             .AsNoTracking()
-            .Include(room => room.Tasks.Where(task => !task.IsDone))
-            .ThenInclude(task => task.Tags)
             .Where(room => room.Tasks.Any(task => !task.IsDone))
+            .Select(room => new RoomDashboardDto
+            {
+                RoomId = room.Id,
+                RoomName = room.Name,
+                HomeUsers = room.Home!.Users.Select(u => new UserDto 
+                { 
+                    UserId = u.Id, 
+                    Username = u.Username,
+                    HomeId =  u.Home.Id,
+                    TotalXp = u.TotalXp
+                }).ToList(),
+                
+                ActiveTasks = room.Tasks
+                    .Where(task => !task.IsDone)
+                    .Select(task => new TaskDetailsDto
+                    {
+                        TaskId = task.Id,
+                        Title = task.Title,
+                        AssignedUsername = task.UserAssigned != null ? task.UserAssigned.Username : null,
+                        RoomId = task.RoomId,
+                        RoomName = task.Room.Name,
+                        Tags = task.Tags.ToList(),
+                        DueDate = task.DueDate,
+                        Description =  task.Description,
+                        IsDone = task.IsDone
+                    }).ToList()
+            })
             .ToListAsync();
     }
     
+    public async Task<List<TaskDetailsDto>> GetAssignedTasksAsync(int userId)
+    {
+        await using var context = await factory.CreateDbContextAsync();
+        
+        return await context.HouseTasks
+            .AsNoTracking()
+            .Where(task => task.UserAssignedId == userId && !task.IsDone)
+            .Select(task => new TaskDetailsDto
+            {
+                TaskId = task.Id,
+                Title = task.Title,
+                AssignedUsername = task.UserAssigned != null ? task.UserAssigned.Username : null,
+                RoomId = task.RoomId,
+                RoomName = task.Room.Name,
+                Tags = task.Tags.ToList(),
+                DueDate = task.DueDate,
+                Description =  task.Description,
+                IsDone = task.IsDone
+            })
+            .ToListAsync();
+    }
+    
+    public async Task<int> CountAssignedTasksAsync(int userId)
+    {
+        await using var context = await factory.CreateDbContextAsync();
+        
+        return await context.HouseTasks
+            .AsNoTracking()
+            .Where(task => task.UserAssignedId == userId && !task.IsDone)
+            .CountAsync();
+    }
+    
     // Récupérer les pièces et leurs tâches terminées
-    public async Task<List<Room>> GetRoomsDoneTasksAsync(User user)
+    public async Task<List<Room>> GetRoomsDoneTasksAsync(int homeId)
     {
         await using var context = await factory.CreateDbContextAsync();
         return await context.Rooms
-            .GetRoomsByHome(user)
+            .GetRoomsByHome(homeId)
             .AsNoTracking()
             .Include(room => room.Tasks.Where(task => task.IsDone))
             .ThenInclude(task => task.Tags)
@@ -43,69 +100,86 @@ public class HouseService(IDbContextFactory<AppDbContext> factory)
     }
     
     // Récupérer le nombre de tasks
-    public async Task<int> GetTotalTasksAsync(User user)
+    public async Task<int> GetTotalTasksAsync(int homeId)
     {
         await using var context = await factory.CreateDbContextAsync();
         return await context.HouseTasks
-            .GetTasksByHome(user)!
+            .GetTasksByHome(homeId)!
             .AsNoTracking() 
             .CountAsync();
     }
     
     // Récupérer le nombre de tasks terminées
-    public async Task<int> GetTotalDoneTasksAsync(User user)
+    public async Task<int> GetTotalDoneTasksAsync(int homeId)
     {
         await using var context = await factory.CreateDbContextAsync();
         return await context.HouseTasks
-            .GetTasksByHome(user)!
+            .GetTasksByHome(homeId)!
             .Where(task => task.IsDone)
             .AsNoTracking() 
             .CountAsync();
     }
 
     // Ajouter une tâche
-    public async Task AddTaskAsync(HouseTask task)
+    public async Task AddTaskAsync(TaskFormModel formModel)
     {
         await using var context = await factory.CreateDbContextAsync();
-        foreach (var tag in task.Tags)
+        
+        var newTask = new HouseTask
         {
-            context.Entry(tag).State = EntityState.Unchanged;
+            Title = formModel.Title,
+            Description = formModel.Description,
+            DueDate = formModel.DueDate,
+            RoomId = formModel.RoomId,
+            IsDone = formModel.IsDone,
+            UserAssignedId = null,
+            Tags = formModel.Tags.ToList(),
+            UserAssigned = null,
+        };
+        if (formModel.Tags.Any())
+        {
+            var tagIds = formModel.Tags.Select(t => t.Id).ToList();
+            var trackedTags = await context.Tags.Where(t => tagIds.Contains(t.Id)).ToListAsync();
+            newTask.Tags.AddRange(trackedTags);
         }
-        context.HouseTasks.Add(task);
+
+        context.HouseTasks.Add(newTask);
         await context.SaveChangesAsync();
     }
     
-    // supprimer une tâche
-    public async Task RemoveTaskAsync(HouseTask task)
+    public async Task RemoveTaskAsync(int taskId)
     {
         await using var context = await factory.CreateDbContextAsync();
-        context.HouseTasks.Remove(task);
-        await context.SaveChangesAsync();
+        
+        // Ultra-fast SQL Delete without loading the entity into RAM
+        await context.HouseTasks
+            .Where(t => t.Id == taskId)
+            .ExecuteDeleteAsync();
     }
     
-    // Mets à jours la tache en la cherchant de le context et en copiant les valeur de l'objet cloné 
-    // car EF Core génère une erreur car il track déjà la tache que je modifie 
-    public async Task UpdateTaskAsync(HouseTask taskFromForm)
+    public async Task UpdateTaskAsync(TaskFormModel formModel)
     {
+        if (formModel.Id == null) return;
+
         await using var context = await factory.CreateDbContextAsync();
+        
         var existingTask = await context.HouseTasks
             .Include(task => task.Tags)
-            .FirstOrDefaultAsync(task => task.Id == taskFromForm.Id);
+            .FirstOrDefaultAsync(task => task.Id == formModel.Id);
 
         if (existingTask != null)
         {
-            context.Entry(existingTask).CurrentValues.SetValues(taskFromForm);
+            existingTask.Title = formModel.Title;
+            existingTask.Description = formModel.Description;
+            existingTask.DueDate = formModel.DueDate;
+            existingTask.RoomId = formModel.RoomId;
+            existingTask.IsDone = formModel.IsDone;
             
             existingTask.Tags.Clear();
-        
-            foreach (var tag in taskFromForm.Tags)
-            {
-                var trackedTag = await context.Tags.FindAsync(tag.Id);
-                if (trackedTag != null)
-                {
-                    existingTask.Tags.Add(trackedTag);
-                }
-            }
+            var tagIds = formModel.Tags.Select(t => t.Id).ToList();
+            var trackedTags = await context.Tags.Where(t => tagIds.Contains(t.Id)).ToListAsync();
+            existingTask.Tags.AddRange(trackedTags);
+            
             await context.SaveChangesAsync();
         }
     }
@@ -121,23 +195,37 @@ public class HouseService(IDbContextFactory<AppDbContext> factory)
         return home;
     }
     
-    public async Task ToggleTaskAsync(HouseTask toggleTask)
+    public async Task ToggleTaskAsync(int taskId, bool toggleTask)
     {
         await using var context = await factory.CreateDbContextAsync();
         
         await context.HouseTasks
-            .Where(task => task.Id == toggleTask.Id)
-            .ExecuteUpdateAsync(setters => setters.SetProperty(t => t.IsDone, !toggleTask.IsDone));
+            .Where(task => task.Id == taskId)
+            .ExecuteUpdateAsync(setters => setters.SetProperty(t => t.IsDone, !toggleTask));
     }
     
-    public async Task CreateTaskCompletionAsync(TaskCompletion taskCompletion)
+    public async Task AssignUserTaskAsync(int taskId, int? userId)
     {
         await using var context = await factory.CreateDbContextAsync();
         
-        context.Entry(taskCompletion.HouseTask).State = EntityState.Unchanged;
-        context.Entry(taskCompletion.CompletedBy).State = EntityState.Unchanged;
+        await context.HouseTasks
+            .Where(task => task.Id == taskId)
+            .ExecuteUpdateAsync(setters => setters.SetProperty(t => t.UserAssignedId, userId));
+    }
+    
+    public async Task CreateTaskCompletionAsync(TaskCompletionModel taskCompletion)
+    {
+        await using var context = await factory.CreateDbContextAsync();
         
-        context.TaskCompletions.Add(taskCompletion);
+        var newTaskcompletion = new TaskCompletion
+        {
+           HouseTaskId = taskCompletion.HouseTaskId,
+           CompletedById = taskCompletion.CompletedById,
+           CompletedAt = taskCompletion.CompletedAt,
+           XpEarned = taskCompletion.XpEarned,
+        };
+        
+        context.TaskCompletions.Add(newTaskcompletion);
         await context.SaveChangesAsync();
     }
 }

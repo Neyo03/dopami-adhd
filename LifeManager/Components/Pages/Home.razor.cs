@@ -7,17 +7,19 @@ namespace LifeManager.Components.Pages;
 public partial class Home : ComponentBase
 {
     private List<Room>? _rooms;
-    private List<Room>? _roomsWithTasks;
+    private List<RoomDashboardDto>? _roomsWithTasks;
     private List<Room>? _roomsWithDoneTasks;
-
-    private User? _connectedUser;
+    private List<TaskDetailsDto>? _assignedTasks;
+    
+    private UserDto? _connectedUser;
     private UserLevelModel? _levelingUser;
 
     
-    private HouseTask _currentTask = new();
+    private TaskFormModel _currentForm = new();
     
     private int _countTasks;
     private int _countDoneTasks;
+    private int _countAssignedTasks;
     
     private bool _isDrawerOpen;
     private bool _isEditMode;
@@ -40,18 +42,19 @@ public partial class Home : ComponentBase
 
     private async Task LoadDataAsync()
     {
-        
-        _rooms = await HouseService.GetRoomsAsync(_connectedUser);
-        _roomsWithTasks = await HouseService.GetRoomsInprogressTasksAsync(_connectedUser);
-        _countTasks = await HouseService.GetTotalTasksAsync(_connectedUser);
-        _countDoneTasks = await HouseService.GetTotalDoneTasksAsync(_connectedUser);
-        _roomsWithDoneTasks = await HouseService.GetRoomsDoneTasksAsync(_connectedUser);
-        _levelingUser = await LevelingService.CalculateLevelAsync(_connectedUser!.TotalXp);
+        _rooms = await HouseService.GetRoomsAsync(_connectedUser.HomeId);
+        _roomsWithTasks = await HouseService.GetRoomsInprogressTasksOptimizedAsync(_connectedUser.HomeId);
+        _countTasks = await HouseService.GetTotalTasksAsync(_connectedUser.HomeId);
+        _countDoneTasks = await HouseService.GetTotalDoneTasksAsync(_connectedUser.HomeId);
+        _countAssignedTasks = await HouseService.CountAssignedTasksAsync(_connectedUser.UserId);
+        _roomsWithDoneTasks = await HouseService.GetRoomsDoneTasksAsync(_connectedUser.HomeId);
+        _levelingUser = await LevelingService.CalculateLevelAsync(_connectedUser.TotalXp);
+        _assignedTasks = await HouseService.GetAssignedTasksAsync(_connectedUser.UserId);
     }
 
     private void OpenCreateDrawer()
     {
-        _currentTask = new HouseTask();
+        _currentForm = new TaskFormModel();
         _isEditMode = false;
         _isDrawerOpen = true;
     }
@@ -61,37 +64,45 @@ public partial class Home : ComponentBase
         _isOpenDoneTask = !_isOpenDoneTask;
     }
 
-    private void OpenEditDrawer(HouseTask task)
+    private void OpenEditDrawer(TaskDetailsDto task)
     {
-        _currentTask = new HouseTask 
+        _currentForm = new TaskFormModel 
         { 
-            Id = task.Id,
+            Id = task.TaskId,
             Title = task.Title, 
             Description = task.Description,
             DueDate = task.DueDate,
-            Room = task.Room,
+            RoomId = task.RoomId, 
             IsDone = task.IsDone,
             Tags = task.Tags.ToList()
         };
         _isEditMode = true;
         _isDrawerOpen = true;
     }
+    
+    private async Task ToggleAssignUserToTask((TaskDetailsDto task, UserDto user)  args)
+    {
+        bool isSameUser = args.task.AssignedUsername == args.user.Username;
+        args.task.AssignedUsername = isSameUser ? null : args.task.AssignedUsername;
+        await HouseService.AssignUserTaskAsync(args.task.TaskId, isSameUser ? null : args.user.UserId);
+        await LoadDataAsync();
+    }
 
     private void CloseDrawer()
     {
         _isDrawerOpen = false;
-        _currentTask = new HouseTask();
+        _currentForm = new TaskFormModel();
     }
 
     private async Task SaveTask()
     {
         if (_isEditMode)
         {
-            await HouseService.UpdateTaskAsync(_currentTask);
+            await HouseService.UpdateTaskAsync(_currentForm);
         }
         else
         {
-            await HouseService.AddTaskAsync(_currentTask);
+            await HouseService.AddTaskAsync(_currentForm);
         }
         
         await LoadDataAsync();
@@ -100,33 +111,33 @@ public partial class Home : ComponentBase
     
     private async Task RemoveTask()
     {
-        await HouseService.RemoveTaskAsync(_currentTask);
+        await HouseService.RemoveTaskAsync(_currentForm.Id);
         await LoadDataAsync();
         CloseDrawer();
     }
 
-    private async Task ToggleTask(HouseTask task)
+    private async Task ToggleTask(TaskDetailsDto task)
     {
-        await HouseService.ToggleTaskAsync(task);
+        await HouseService.ToggleTaskAsync(task.TaskId, task.IsDone);
         await TaskCompleted(task);
-        await UserService.UpdateTotalXpUser(_connectedUser);
+        await UserService.UpdateTotalXpUser(_connectedUser.UserId);
         _connectedUser = await UserService.GetAuthenticatedUserAsync();
-        _levelingUser = await LevelingService.CalculateLevelAsync(_connectedUser.TotalXp);
-        _roomsWithTasks = await HouseService.GetRoomsInprogressTasksAsync(_connectedUser);
-        _countDoneTasks = await HouseService.GetTotalDoneTasksAsync(_connectedUser);
-        _roomsWithDoneTasks = await HouseService.GetRoomsDoneTasksAsync(_connectedUser);
+        _levelingUser = await LevelingService.CalculateLevelAsync(_connectedUser!.TotalXp);
+        _roomsWithTasks = await HouseService.GetRoomsInprogressTasksOptimizedAsync(_connectedUser.HomeId);
+        _countDoneTasks = await HouseService.GetTotalDoneTasksAsync(_connectedUser.HomeId);
+        _roomsWithDoneTasks = await HouseService.GetRoomsDoneTasksAsync(_connectedUser.HomeId);
     }
     
-    private async Task TaskCompleted(HouseTask task)
+    private async Task TaskCompleted(TaskDetailsDto task)
     {
-        var taskCompletion = new TaskCompletion()
+        var taskCompletionModel = new TaskCompletionModel()
         {
             CompletedAt = new DateTime(),
-            HouseTask = task,
-            CompletedBy = _connectedUser!,
+            HouseTaskId = task.TaskId,
+            CompletedById = _connectedUser!.UserId,
             XpEarned = 10,
         };
 
-        await HouseService.CreateTaskCompletionAsync(taskCompletion);
+        await HouseService.CreateTaskCompletionAsync(taskCompletionModel);
     }
 }

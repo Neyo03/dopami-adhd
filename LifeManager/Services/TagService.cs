@@ -5,11 +5,10 @@ namespace LifeManager.Services;
 
 public class TagService(IDbContextFactory<AppDbContext> factory)
 {
-    public async Task<List<Tag>?> GetTagsAsync(User user)
+    public async Task<List<Tag>?> GetTagsAsync(int homeId)
     {
-        if (user == null) throw new ArgumentNullException(nameof(user));
         await using var context = await factory.CreateDbContextAsync();
-        var home = await context.Homes.Include(home => home.Tags).FirstOrDefaultAsync( home => home.Id == user.Home.Id);
+        var home = await context.Homes.Include(home => home.Tags).FirstOrDefaultAsync( home => home.Id == homeId);
         return home?.Tags.ToList(); 
     }
 

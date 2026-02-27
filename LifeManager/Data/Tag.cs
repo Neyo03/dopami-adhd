@@ -8,7 +8,7 @@ public class Tag
     public string ColorHex { get; set; } = "#3b82f6";
     
     public List<HouseTask> Tasks { get; set; } = new();
-    public Home Home { get; set; } = new();
-    
+    public Home Home { get; set; }
+    public int HomeId { get; set; }
     
 }

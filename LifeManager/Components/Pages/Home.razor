@@ -1,6 +1,8 @@
 ﻿@page "/"
+@using LifeManager.Model
 @using LifeManager.Services
 @using LifeManager.State
+@using Microsoft.IdentityModel.Tokens
 @inject HouseService HouseService 
 @inject UserService UserService 
 @inject TagStateService TagState 
@@ -19,77 +21,125 @@
 }
 else
 {
-    <div class="card border w-1/2 p-5">
-        <div class="rounded-t-xl mb-5 mt-5">
-            <h2 class="card-title flex justify-between items-center">
-                <div class="w-1/2 flex flex-row gap-1 items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18 9 11.25l4.306 4.306a11.95 11.95 0 0 1 5.814-5.518l2.74-1.22m0 0-5.94-2.281m5.94 2.28-2.28 5.941" />
-                    </svg>
-
-
-                    Ta progression
-                    @* <small class="text-primary-content/50 text-xs">@_countDoneTasks / @_countTasks accomplies</small> *@
-
-                </div>
-                
-                <div class="flex gap-1 items-center w-1/2 justify-end">
-                    <div class="badge badge-success">Niveau @_levelingUser!.Level</div>
-                    @* <label class="input input-sm rounded-lg text-neutral-content w-2/3"> *@
-                    @*     <input type="search" required placeholder="Search" /> *@
-                    @* </label> *@
-                    @* <small class="bg-base-100 ms-1 p-2 rounded-lg text-neutral-content shadow-xs text-xs cursor-pointer"  *@
-                    @*        @onclick="OpenCreateDrawer"> *@
-                    @*     + Ajouter *@
-                    @* </small> *@
-                </div>
-            </h2>
+    <div class="w-full flex justify-center gap-3 mb-5">
+        <div class="bg-primary flex justify-center items-center p-5 rounded-lg text-neutral-content shadow-2xl text-xl cursor-pointer w-50 h-25"
+               @onclick="OpenCreateDrawer">
+            + Tâche
         </div>
-        <div class="mt-5 ">
-            <p class="text-xs"> @_levelingUser!.CurrentLevelXp / @_levelingUser!.XpRequiredForNextLevel points</p>
-            <progress class="progress w-full" value="0" max="100"></progress>
-        </div>
-        
-        <div class="flex flex-row justify-between items-center">
-            <div class="rounded-md p-5 flex flex-col items-center justify-center w-1/3 border border-warning bg-warning-content">
-                <svg class="w-6 h-6 mb-2 text-warning dark:text-warning" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-                    <path stroke="currentColor" stroke-width="2" d="M11.083 5.104c.35-.8 1.485-.8 1.834 0l1.752 4.022a1 1 0 0 0 .84.597l4.463.342c.9.069 1.255 1.2.556 1.771l-3.33 2.723a1 1 0 0 0-.337 1.016l1.03 4.119c.214.858-.71 1.552-1.474 1.106l-3.913-2.281a1 1 0 0 0-1.008 0L7.583 20.8c-.764.446-1.688-.248-1.474-1.106l1.03-4.119A1 1 0 0 0 6.8 14.56l-3.33-2.723c-.698-.571-.342-1.702.557-1.771l4.462-.342a1 1 0 0 0 .84-.597l1.753-4.022Z"/>
-                </svg>
-
-                <span class="text-xs">Tâches</span>
-                <b class="text-lg">@_countTasks</b>
-
-            </div>
-            
-        </div>
-        
-       
-        
-        
-        
-        <RoomTaskList
-            Rooms="_roomsWithTasks"
-            OnToggleTask="ToggleTask"
-            OnEditTask="OpenEditDrawer" />
-        <div class="divider cursor-pointer link text-xs" @onclick="ToggleDoneTasksSection">Tâches terminées
-        </div>
-        @if (_isOpenDoneTask)
-        {
-            <RoomTaskList
-                Rooms="_roomsWithDoneTasks"
-                OnToggleTask="ToggleTask"
-                OnEditTask="OpenEditDrawer" />
-        }
     </div>
     
-    <TaskDrawer IsOpen="_isDrawerOpen" 
-                IsEditMode="_isEditMode"
-                CurrentTask="_currentTask" 
-                Rooms="_rooms" 
-                Tags="TagState.Tags"
-                OnClose="CloseDrawer" 
-                OnSave="SaveTask" 
-                OnDelete="RemoveTask"
+    <div class="flex gap-3 items-start">
+        <div class="flex gap-2 flex-col w-1/5">
+            <div class="card border p-5">
+                <label class="input input-sm rounded-lg text-neutral-content w-full">
+                    <input type="search" required placeholder="Search" />
+                </label>
+            
+                <RoomTaskList
+                    Rooms="_roomsWithTasks"
+                    OnToggleTask="ToggleTask"
+                    OnEditTask="OpenEditDrawer"
+                    OnToggleAssignUser="ToggleAssignUserToTask"
+                />
+            </div>
+            
+            @* <div class="card border p-5"> *@
+            @*     <RoomTaskList *@
+            @*         Rooms="_roomsWithDoneTasks" *@
+            @*         OnToggleTask="ToggleTask" *@
+            @*         OnEditTask="OpenEditDrawer"/> *@
+            @* </div> *@
+        </div>
+        <div class="card border w-2/4 p-5">
+            <div class="rounded-t-xl mb-5 mt-5">
+                <h2 class="card-title flex justify-between items-center">
+                    <div class="w-1/2 flex flex-col gap-1">
+                        @_connectedUser?.Username
+                        <small class="text-primary-content/50 text-xs">Novice</small>
+                    </div>
+
+                    <div class="flex gap-1 items-center w-1/2 justify-end">
+                        <div class="mask mask-hexagon  shadow-xl bg-success w-10 h-10 text-white flex justify-center items-center">
+                            <div class="mask mask-hexagon  shadow-md bg-green-950/50 w-8 h-8 text-white flex justify-center items-center">
+                                <b>@_levelingUser!.Level</b>
+                            </div>
+                        </div>
+                       
+                    </div>
+                </h2>
+            </div>
+            <div>
+                <b class="text-md w-full flex justify-between"> <span>@_levelingUser!.CurrentLevelXp points</span> <span class="opacity-60">@_levelingUser!.XpRequiredForNextLevel</span> </b>
+                <progress class="progress h-5 w-full" value="@_levelingUser!.CurrentLevelXp" max="@_levelingUser!.XpRequiredForNextLevel"></progress>
+            </div>
+
+            <div class="flex flex-row justify-between gap-3">
+                <div class="rounded-md p-5 flex flex-col items-center justify-center w-1/3 border border-warning bg-warning-content">
+                    <svg class="w-6 h-6 mb-2 text-warning dark:text-warning" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                        <path stroke="currentColor" stroke-width="2" d="M11.083 5.104c.35-.8 1.485-.8 1.834 0l1.752 4.022a1 1 0 0 0 .84.597l4.463.342c.9.069 1.255 1.2.556 1.771l-3.33 2.723a1 1 0 0 0-.337 1.016l1.03 4.119c.214.858-.71 1.552-1.474 1.106l-3.913-2.281a1 1 0 0 0-1.008 0L7.583 20.8c-.764.446-1.688-.248-1.474-1.106l1.03-4.119A1 1 0 0 0 6.8 14.56l-3.33-2.723c-.698-.571-.342-1.702.557-1.771l4.462-.342a1 1 0 0 0 .84-.597l1.753-4.022Z"/>
+                    </svg>
+
+                    <span class="text-xs">Tâches complétées</span>
+                    <b class="text-lg">@_countDoneTasks</b>
+
+                </div>
+
+                <div class="rounded-md p-5 flex flex-col items-center justify-center w-1/3 border border-purple-500 bg-purple-500/40">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 text-purple-400">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 18.75h-9m9 0a3 3 0 0 1 3 3h-15a3 3 0 0 1 3-3m9 0v-3.375c0-.621-.503-1.125-1.125-1.125h-.871M7.5 18.75v-3.375c0-.621.504-1.125 1.125-1.125h.872m5.007 0H9.497m5.007 0a7.454 7.454 0 0 1-.982-3.172M9.497 14.25a7.454 7.454 0 0 0 .981-3.172M5.25 4.236c-.982.143-1.954.317-2.916.52A6.003 6.003 0 0 0 7.73 9.728M5.25 4.236V4.5c0 2.108.966 3.99 2.48 5.228M5.25 4.236V2.721C7.456 2.41 9.71 2.25 12 2.25c2.291 0 4.545.16 6.75.47v1.516M7.73 9.728a6.726 6.726 0 0 0 2.748 1.35m8.272-6.842V4.5c0 2.108-.966 3.99-2.48 5.228m2.48-5.492a46.32 46.32 0 0 1 2.916.52 6.003 6.003 0 0 1-5.395 4.972m0 0a6.726 6.726 0 0 1-2.749 1.35m0 0a6.772 6.772 0 0 1-3.044 0"/>
+                    </svg>
+
+                    <span class="text-xs">Score total</span>
+                    <b class="text-lg">@_connectedUser.TotalXp</b>
+
+                </div>
+
+                <div class="rounded-md p-5 flex flex-col items-center justify-center w-1/3 border border-purple-500 bg-purple-500/40 opacity-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 text-purple-400">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 18.75h-9m9 0a3 3 0 0 1 3 3h-15a3 3 0 0 1 3-3m9 0v-3.375c0-.621-.503-1.125-1.125-1.125h-.871M7.5 18.75v-3.375c0-.621.504-1.125 1.125-1.125h.872m5.007 0H9.497m5.007 0a7.454 7.454 0 0 1-.982-3.172M9.497 14.25a7.454 7.454 0 0 0 .981-3.172M5.25 4.236c-.982.143-1.954.317-2.916.52A6.003 6.003 0 0 0 7.73 9.728M5.25 4.236V4.5c0 2.108.966 3.99 2.48 5.228M5.25 4.236V2.721C7.456 2.41 9.71 2.25 12 2.25c2.291 0 4.545.16 6.75.47v1.516M7.73 9.728a6.726 6.726 0 0 0 2.748 1.35m8.272-6.842V4.5c0 2.108-.966 3.99-2.48 5.228m2.48-5.492a46.32 46.32 0 0 1 2.916.52 6.003 6.003 0 0 1-5.395 4.972m0 0a6.726 6.726 0 0 1-2.749 1.35m0 0a6.772 6.772 0 0 1-3.044 0"/>
+                    </svg>
+
+                    <span class="text-xs">Score total</span>
+                    <b class="text-lg">@_connectedUser.TotalXp</b>
+
+                </div>
+
+            </div>
+        </div>
+        <div class="w-1/5">
+            <b class="text-xl w-full flex justify-between items-end"><small class="opacity-50 text-xs"> micro-tâches</small> @_countAssignedTasks / 3  </b> 
+            <div class="flex gap-2 flex-col ">
+                
+                @foreach (var assignedTask in _assignedTasks)
+                {
+                    <div class="card border p-5">
+                        <h5 class="flex justify-end w-full text-primary-content"><kbd class="kbd">+ 15 pts</kbd></h5>
+                        <h3>@assignedTask.Title <small class="text-xs opacity-50">@assignedTask.RoomName</small></h3>
+                        @foreach (var tag in assignedTask.Tags)
+                        {
+                            <span class="badge badge-xs cursor-pointer group flex items-center gap-1 transition-all text-white border-none " style="background-color: @tag.ColorHex">
+                                @tag.Label
+                            </span>
+                        }
+
+                        <small class="text-xs opacity-50 mt-3 mb-2 break-all wrap-break-word">@(assignedTask.Description.IsNullOrEmpty() ? "Empty description." : assignedTask.Description)</small>
+                        <button class="w-full btn bg-primary" @onclick="() => ToggleTask(assignedTask)">Enfin fini ! </button>
+                        <small class="w-full flex justify-center text-xs opacity-50 link" @onclick="() => ToggleAssignUserToTask((assignedTask,  _connectedUser
+                        ))">Ne plus la faire</small>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>  
+        <TaskDrawer IsOpen="_isDrawerOpen" 
+                    IsEditMode="_isEditMode"
+                    CurrentForm="_currentForm" 
+                    Rooms="_rooms" 
+                    Tags="TagState.Tags"
+                    OnClose="CloseDrawer" 
+                    OnSave="SaveTask" 
+                    OnDelete="RemoveTask"
+            
+        />
     
-    />
 }

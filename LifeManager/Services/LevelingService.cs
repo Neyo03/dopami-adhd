@@ -13,7 +13,6 @@ public class LevelingService
         int totalXpForNext = 0;
         int xpForNext = _thresholds[1];
         
-
         for (int i = 1; i < _thresholds.Length; i++)
         {
             totalXpForNext += _thresholds[i];
