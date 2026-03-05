@@ -1,0 +1,49 @@
+﻿@using LifeManager.Model
+@using Microsoft.IdentityModel.Tokens
+
+<div>
+    @if (CompletedTasks.IsNullOrEmpty())
+    {
+        <span class="text-neutral-content/50 text-xs"> Aucunes tâches complétées cette semaine.</span>
+    }
+    <ul class="timeline timeline-vertical timeline-completed-task timeline-snap-icon">
+        @{ int competedTaskIndex = 0; }
+        @foreach (var dailyUserTasks in CompletedTasks)
+        {
+
+            <li @key="dailyUserTasks.Date">
+                @if (competedTaskIndex > 0)
+                {
+                    <hr />
+                }
+                <div class="timeline-start">
+                </div>
+                <div class="timeline-middle">
+                    <button type="button" class=" rounded-full w-6 h-6 flex justify-center items-center text-center bg-base-200  text-white cursor-pointer text-xs ">
+                        @dailyUserTasks.Username[0]
+                    </button>
+                </div>
+                <div class="timeline-end">
+                    <span>@dailyUserTasks.Username à fait @dailyUserTasks.Tasks.Count tâche(s) @dailyUserTasks.DateFormat</span>
+                    @foreach (var task in dailyUserTasks.Tasks)
+                    {
+                        <div class="w-full flex justify-between items-center p-1 ps-2">
+                            <p class="text-xs link opacity-50" @key="task.TaskCompletionId">
+                                @task.TaskTitle 
+                            </p>
+                            <small class="text-xs font-light opacity-40">+@task.XpEarned pts</small>
+                        </div>
+                        
+                    }
+                </div>
+                <hr/>
+            </li>
+            
+            competedTaskIndex++;
+        }
+    </ul>
+</div>
+
+@code {
+    [Parameter] public required List<DailyUserTasksDto> CompletedTasks { get; set; }
+}

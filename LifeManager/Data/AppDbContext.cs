@@ -10,6 +10,6 @@ public class AppDbContext : DbContext
     public DbSet<Room> Rooms { get; set; }
     public DbSet<HouseTask> HouseTasks { get; set; }
     public DbSet<Tag> Tags { get; set; }
-    
     public DbSet<User> Users { get; set; }
+    public DbSet<TaskCompletion> TaskCompletions { get; set; }
 }

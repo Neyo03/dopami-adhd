@@ -56,7 +56,7 @@
 
 @code {
     private TagCreateModel _model = new() { ColorHex = "#3b82f6" };
-    private User? _connectedUser;
+    private UserDto? _connectedUser;
 
     private readonly string[] _palette = new[]
     {
@@ -82,7 +82,7 @@
     private async Task HandleValidSubmit()
     {
        
-        if (_connectedUser?.Home == null) 
+        if (_connectedUser?.HomeId == null) 
         {
             return;
         }
@@ -91,7 +91,7 @@
         {
             Label = _model.Label,
             ColorHex = _model.ColorHex,
-            Home = _connectedUser.Home
+            HomeId = _connectedUser.HomeId
         };
         
         await TagState.AddTagAsync(tag);

@@ -280,10 +280,10 @@ C:\Users\wagner\Desktop\www\dotnet\LifeManager\LifeManager\bin\Debug\net10.0\run
 C:\Users\wagner\Desktop\www\dotnet\LifeManager\LifeManager\bin\Debug\net10.0\runtimes\win-x86\native\Microsoft.Data.SqlClient.SNI.dll
 C:\Users\wagner\Desktop\www\dotnet\LifeManager\LifeManager\bin\Debug\net10.0\package-lock.json
 C:\Users\wagner\Desktop\www\dotnet\LifeManager\LifeManager\bin\Debug\net10.0\package.json
-C:\Users\wagner\Desktop\www\dotnet\LifeManager\LifeManager\obj\Debug\net10.0\compressed\vazeon065p-{0}-ieho16dd4k-ieho16dd4k.gz
 C:\Users\wagner\Desktop\www\dotnet\LifeManager\LifeManager\obj\Debug\net10.0\scopedcss\Components\Layout\NavMenu.razor.rz.scp.css
 C:\Users\wagner\Desktop\www\dotnet\LifeManager\LifeManager\obj\Debug\net10.0\compressed\ae6nzw326z-{0}-h6p5hwyckv-h6p5hwyckv.gz
 C:\Users\wagner\Desktop\www\dotnet\LifeManager\LifeManager\obj\Debug\net10.0\compressed\h010lxqerd-{0}-h6p5hwyckv-h6p5hwyckv.gz
 C:\Users\wagner\Desktop\www\dotnet\LifeManager\LifeManager\obj\Debug\net10.0\LifeManager.sourcelink.json
 C:\Users\wagner\Desktop\www\dotnet\LifeManager\LifeManager\bin\Debug\net10.0\BCrypt.Net-Next.dll
-C:\Users\wagner\Desktop\www\dotnet\LifeManager\LifeManager\obj\Debug\net10.0\compressed\75f7h6puoa-{0}-nh2mssv9jp-nh2mssv9jp.gz
+C:\Users\wagner\Desktop\www\dotnet\LifeManager\LifeManager\obj\Debug\net10.0\compressed\vazeon065p-{0}-r12yvoyks8-r12yvoyks8.gz
+C:\Users\wagner\Desktop\www\dotnet\LifeManager\LifeManager\obj\Debug\net10.0\compressed\75f7h6puoa-{0}-kmhghxldu8-kmhghxldu8.gz

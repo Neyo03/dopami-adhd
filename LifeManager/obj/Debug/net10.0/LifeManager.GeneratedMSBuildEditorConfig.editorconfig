@@ -34,6 +34,10 @@ build_property.EnableCodeStyleSeverity =
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xBcHAucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/wagner/Desktop/www/dotnet/LifeManager/LifeManager/Components/CompletedTaskList.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xDb21wbGV0ZWRUYXNrTGlzdC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/wagner/Desktop/www/dotnet/LifeManager/LifeManager/Components/Pages/Documentation/Documentation.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xEb2N1bWVudGF0aW9uXERvY3VtZW50YXRpb24ucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
@@ -68,6 +72,10 @@ build_metadata.AdditionalFiles.CssScope =
 
 [C:/Users/wagner/Desktop/www/dotnet/LifeManager/LifeManager/Components/Pages/Users/Registrer.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xVc2Vyc1xSZWdpc3RyZXIucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/wagner/Desktop/www/dotnet/LifeManager/LifeManager/Components/RadioGroup.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xSYWRpb0dyb3VwLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/wagner/Desktop/www/dotnet/LifeManager/LifeManager/Components/RoomTaskList.razor]
