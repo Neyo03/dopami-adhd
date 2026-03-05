@@ -10,12 +10,12 @@
 using System;
 using System.Reflection;
 
-[assembly: System.Reflection.AssemblyCompanyAttribute("LifeManager")]
+[assembly: System.Reflection.AssemblyCompanyAttribute("LifeManager.Tests")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
 [assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+2cb28224c26ccb19c0a2271bb76039666b3dc71c")]
-[assembly: System.Reflection.AssemblyProductAttribute("LifeManager")]
-[assembly: System.Reflection.AssemblyTitleAttribute("LifeManager")]
+[assembly: System.Reflection.AssemblyProductAttribute("LifeManager.Tests")]
+[assembly: System.Reflection.AssemblyTitleAttribute("LifeManager.Tests")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
 
 // Généré par la classe MSBuild WriteCodeFragment.

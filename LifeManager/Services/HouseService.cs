@@ -247,7 +247,12 @@ public class HouseService(IDbContextFactory<AppDbContext> factory)
         
         await context.HouseTasks
             .Where(task => task.Id == taskId)
-            .ExecuteUpdateAsync(setters => setters.SetProperty(t => t.IsDone, !toggleTask));
+            .ExecuteUpdateAsync(
+                setters => 
+                    setters
+                        .SetProperty(t => t.IsDone, !toggleTask)
+                        .SetProperty(t => t.UserAssignedId, (int?)null)
+                    );
     }
     
     public async Task AssignUserTaskAsync(int taskId, int? userId)
