@@ -20,7 +20,7 @@
 
             <EditForm Model="_model" OnValidSubmit="HandleRegistration" FormName="RegisterForm" class="space-y-4">
                 <DataAnnotationsValidator />
-                
+                <ValidationSummary />
                 <label class="floating-label w-full mb-4">
                     <span>House Name</span>
                     <InputText class="input input-bordered w-full" @bind-Value="_model.HouseName" />
@@ -81,33 +81,36 @@
 
     private async Task HandleRegistration()
     {
+        Console.WriteLine("test");
         _errorMessage = null;
         
-        var newUser = new User
-        {
-            Firstname = _model.Firstname,
-            Lastname = _model.Lastname,
-            Username = _model.Username,
-            Email = _model.Email,
-            Password = _model.Password
-        };
-
         var newHome = new Home()
         {
             Name = _model.HouseName
         };
 
-        var home = HouseService.CreateHomeAsync(newHome);
+        await HouseService.CreateHomeAsync(newHome);
+  
+         var newUser = new User
+        {
+            Firstname = _model.Firstname,
+            Lastname = _model.Lastname,
+            Username = _model.Username,
+            Email = _model.Email,
+            HomeId = newHome.Id,
+            Password = _model.Password,
+            TotalXp = 0
+        };
         
-        newUser.Home = home.Result;
         var isSuccess = await UserService.RegisterAsync(newUser);
-
         if (isSuccess)
         {
             Nav.NavigateTo("/login");
         }
         else
         {
+        // solution en attendant pour éviter de sortir du scope de mon ticket 
+            await HouseService.DeleteHomeAsync(newHome);
             _errorMessage = "This email is already in use.";
         }
     }

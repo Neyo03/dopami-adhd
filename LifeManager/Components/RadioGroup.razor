@@ -1,0 +1,40 @@
+﻿@typeparam TEnum where TEnum : struct, Enum
+@using LifeManager.Extensions <div class="mt-3 flex flex-col justify-start items-start">
+    <b class="mb-3 text-base opacity-50">@Title</b>
+    
+    <div class="flex flex-wrap gap-3"> 
+        @foreach (var item in Enum.GetValues<TEnum>())
+        {
+            if (Convert.ToInt32(item) == 0) continue;
+            
+            bool isChecked = EqualityComparer<TEnum>.Default.Equals(Value, item);
+            
+            <label class="btn @(isChecked ? "bg-primary text-white" : "bg-base-200")" @key="item">
+                <input type="radio" 
+                       name="@Name" 
+                       class="hidden" 
+                       checked="@isChecked"
+                       value="@item.ToString()" 
+                       @onchange="() => OnSelectionChangedAsync(item)" />
+                       
+                <span>@item.GetDisplayName()</span>
+            </label>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter] public string Title { get; set; } = string.Empty;
+    [Parameter] public string Name { get; set; } = Guid.NewGuid().ToString();
+    [Parameter] public TEnum Value { get; set; } = default!;
+    [Parameter] public EventCallback<TEnum> ValueChanged { get; set; }    
+    
+    private async Task OnSelectionChangedAsync(TEnum newValue)
+    {
+        Value = newValue;
+        if (ValueChanged.HasDelegate)
+        {
+            await ValueChanged.InvokeAsync(Value);
+        }
+    }
+}

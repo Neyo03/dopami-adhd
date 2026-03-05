@@ -1,8 +1,10 @@
 ﻿@page "/rooms"
 @using Microsoft.EntityFrameworkCore
 @using LifeManager.Data
-@inject AppDbContext DbContext
-@inject NavigationManager Navigation
+@using LifeManager.Model
+@using LifeManager.Services
+@inject HouseService HouseService
+@inject UserService UserService
 @rendermode InteractiveServer
 
 <h3>🏠 Mes Pièces</h3>
@@ -11,7 +13,7 @@
     <a href="/rooms/create" class="btn btn-primary">+ Nouvelle Pièce</a>
 </div>
 
-@if (rooms == null)
+@if (_rooms == null)
 {
     <p><em>Chargement...</em></p>
 }
@@ -25,13 +27,13 @@ else
         </tr>
         </thead>
         <tbody>
-        @foreach (var room in rooms)
+        @foreach (var room in _rooms)
         {
             <tr>
-                <td>@room.Name</td>
+                <td>@room.RoomName</td>
                 <td>
-                    <a href="/rooms/edit/@room.Id" class="btn btn-sm btn-secondary">Modifier</a>
-                    <button class="btn btn-sm btn-danger" @onclick="() => DeleteRoom(room)">Supprimer</button>
+                    <a href="/rooms/edit/@room.RoomId" class="btn btn-sm btn-secondary">Modifier</a>
+                    <button class="btn btn-sm btn-danger" @onclick="() => DeleteRoom(room.RoomId, _connectedUser.HomeId)">Supprimer</button>
                 </td>
             </tr>
         }
@@ -40,18 +42,19 @@ else
 }
 
 @code {
-    private List<Room>? rooms;
+    private List<RoomDashboardDto>? _rooms;
+    private UserDto? _connectedUser;
 
     protected override async Task OnInitializedAsync()
     {
-        // On charge la liste au démarrage
-        rooms = await DbContext.Rooms.ToListAsync();
+        _connectedUser = await UserService.GetAuthenticatedUserAsync();
+        if (_connectedUser == null) { return; }
+        _rooms = await HouseService.GetRoomsAsync(_connectedUser.HomeId);
     }
 
-    private async Task DeleteRoom(Room room)
+    private async Task DeleteRoom(int roomId, int homeId)
     {
-        DbContext.Rooms.Remove(room);
-        await DbContext.SaveChangesAsync();
-        rooms?.Remove(room); // Mise à jour visuelle instantanée
+        await HouseService.DeleteRoomAsync(roomId, homeId);
+        if (_connectedUser != null) _rooms = await HouseService.GetRoomsAsync(homeId);
     }
 }

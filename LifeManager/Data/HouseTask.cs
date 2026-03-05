@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.Text.Json.Serialization;
+using LifeManager.Data.Enums;
 
 namespace LifeManager.Data;
 
@@ -10,17 +10,27 @@ public class HouseTask
     [Required(ErrorMessage = "Un titre est obligatoire.")]
     public string Title { get; set; } = "";
     
-    public string Description { get; set; } = "";
+    public string? Description { get; set; } = "";
     
     public DateTime? DueDate { get; set; }
     
     public bool IsDone { get; set; }
     
-    public Room Room { get; set; } = new();
+    public int RoomId { get; set; }
+    
+    public Room Room { get; set; }
     
     public List<Tag> Tags { get; set; } = new();
     
-    public int? UserAssignedId { get; set; }
+    public User? UserAssigned { get; set; }
     
-    public int? CompletedById { get; set; }
+    public int? UserAssignedId { get; set; }
+
+    public int XpToEarn { get; set; } = 0;
+    
+    public TaskDuration Duration { get; set; }
+    
+    public TaskEnergy Energy { get; set; }
+    
+    public TaskImpact Impact { get; set; }
 }
