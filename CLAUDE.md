@@ -26,8 +26,10 @@ docker compose -f LifeManager/compose.yaml up
 ## Architecture
 
 **LifeManager** is an ASP.NET Core 10 Blazor Server app (Interactive Server render mode) for household task management with gamification. The single project is under `LifeManager/`.
-Avant de modifier un fichier, tu DOIS lire au moins
-3 fichiers similaires pour comprendre le pattern du projet.
+
+## Rules
+
+- Avant de modifier un fichier, tu DOIS lire au moins 3 fichiers similaires pour comprendre le pattern du projet.
 
 ### Data Model
 
@@ -66,3 +68,4 @@ Database: **PostgreSQL** via `Npgsql.EntityFrameworkCore.PostgreSQL`. Connection
 ### Gamification
 
 `LevelingService` calculates user level from `TotalXp` using a threshold array. `UserService.UpdateTotalXpUser` recalculates and persists total XP by summing `TaskCompletion.XpEarned` records.
+
