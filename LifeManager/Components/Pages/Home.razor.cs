@@ -124,11 +124,7 @@ public partial class Home : ComponentBase
         await HouseService.ToggleTaskAsync(task.TaskId, task.IsDone);
         await TaskCompleted(task);
         await UserService.UpdateTotalXpUser(_connectedUser.UserId);
-        _connectedUser = await UserService.GetAuthenticatedUserAsync();
-        _levelingUser = await LevelingService.CalculateLevelAsync(_connectedUser!.TotalXp);
-        _roomsWithTasks = await HouseService.GetRoomsInprogressTasksOptimizedAsync(_connectedUser.HomeId);
-        _countDoneTasks = await HouseService.GetTotalDoneTasksAsync(_connectedUser.HomeId);
-        _roomsWithDoneTasks = await HouseService.GetRoomsDoneTasksWeekAsync(_connectedUser.HomeId);
+        await LoadDataAsync();
     }
     
     private async Task TaskCompleted(TaskDetailsDto task)
