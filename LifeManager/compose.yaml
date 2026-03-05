@@ -16,19 +16,21 @@
       interval: 5s
       timeout: 5s
       retries: 5
+    networks:
+      - lifemanager-net
 
   lifemanager-migration:
-    build: .
-    image: lifemanager-app:latest
+    image: ghcr.io/Neyo03/dopami-adhd:latest
     container_name: lifemanager_migration
     entrypoint: ["./efbundle", "--connection", "Host=lifemanager-db;Database=lifemanager;Username=postgres;Password=YourStrongPassword123!"]
     depends_on:
       lifemanager-db:
         condition: service_healthy
+    networks:
+      - lifemanager-net
 
   lifemanager-app:
-    build: .
-    image: lifemanager-app:latest
+    image: ghcr.io/Neyo03/dopami-adhd:latest
     container_name: lifemanager_app
     environment:
       - ConnectionStrings__DefaultConnection=Host=lifemanager-db;Database=lifemanager;Username=postgres;Password=YourStrongPassword123!
@@ -38,6 +40,12 @@
       lifemanager-migration:
         condition: service_completed_successfully
     restart: unless-stopped
+    networks:
+      - lifemanager-net
+
+networks:
+  lifemanager-net:
+    driver: bridge
 
 volumes:
   pgdata:
