@@ -85,7 +85,7 @@ public class HouseServiceTests : IDisposable
     {
         var seed = await SeedAsync(isDone: false);
 
-        await _service.ToggleTaskAsync(seed.TaskId, false);
+        await _service.ToggleTaskAsync(seed.TaskId, false, seed.HomeId);
 
         await using var ctx = new AppDbContext(_options);
         var task = await ctx.HouseTasks.FindAsync(seed.TaskId);
@@ -97,7 +97,7 @@ public class HouseServiceTests : IDisposable
     {
         var seed = await SeedAsync(isDone: true);
 
-        await _service.ToggleTaskAsync(seed.TaskId, true);
+        await _service.ToggleTaskAsync(seed.TaskId, true, seed.HomeId);
 
         await using var ctx = new AppDbContext(_options);
         var task = await ctx.HouseTasks.FindAsync(seed.TaskId);
@@ -109,7 +109,7 @@ public class HouseServiceTests : IDisposable
     {
         var seed = await SeedAsync(isDone: false, assignUser: true);
 
-        await _service.ToggleTaskAsync(seed.TaskId, false);
+        await _service.ToggleTaskAsync(seed.TaskId, false, seed.HomeId);
 
         await using var ctx = new AppDbContext(_options);
         var task = await ctx.HouseTasks.FindAsync(seed.TaskId);
@@ -123,7 +123,7 @@ public class HouseServiceTests : IDisposable
     {
         var seed = await SeedAsync();
 
-        await _service.AssignUserTaskAsync(seed.TaskId, seed.UserId);
+        await _service.AssignUserTaskAsync(seed.TaskId, seed.HomeId, seed.UserId);
 
         await using var ctx = new AppDbContext(_options);
         var task = await ctx.HouseTasks.FindAsync(seed.TaskId);
@@ -135,7 +135,7 @@ public class HouseServiceTests : IDisposable
     {
         var seed = await SeedAsync(assignUser: true);
 
-        await _service.AssignUserTaskAsync(seed.TaskId, userId: null);
+        await _service.AssignUserTaskAsync(seed.TaskId, userHomeId: seed.HomeId, userId: null);
 
         await using var ctx = new AppDbContext(_options);
         var task = await ctx.HouseTasks.FindAsync(seed.TaskId);

@@ -29,7 +29,7 @@ public partial class Home : ComponentBase
     protected override async Task OnInitializedAsync()
     {
         _connectedUser = await UserService.GetAuthenticatedUserAsync();
-        _levelingUser = await LevelingService.CalculateLevelAsync(_connectedUser!.TotalXp);
+        if (_connectedUser == null) { return; }
         TagState.OnChange += StateHasChanged;
         await TagState.InitializeAsync(_connectedUser);
         await LoadDataAsync();
@@ -42,14 +42,28 @@ public partial class Home : ComponentBase
 
     private async Task LoadDataAsync()
     {
-        _rooms = await HouseService.GetRoomsAsync(_connectedUser.HomeId);
-        _roomsWithTasks = await HouseService.GetRoomsInprogressTasksOptimizedAsync(_connectedUser.HomeId);
-        _countTasks = await HouseService.GetTotalTasksAsync(_connectedUser.HomeId);
-        _countDoneTasks = await HouseService.GetTotalDoneTasksAsync(_connectedUser.HomeId);
-        _countAssignedTasks = await HouseService.CountAssignedTasksAsync(_connectedUser.UserId);
-        _roomsWithDoneTasks = await HouseService.GetRoomsDoneTasksWeekAsync(_connectedUser.HomeId);
-        _levelingUser = await LevelingService.CalculateLevelAsync(_connectedUser.TotalXp);
-        _assignedTasks = await HouseService.GetAssignedTasksAsync(_connectedUser.UserId);
+        var roomsTask            = HouseService.GetRoomsAsync(_connectedUser!.HomeId);
+        var roomsWithTasksTask   = HouseService.GetRoomsInprogressTasksOptimizedAsync(_connectedUser.HomeId);
+        var countTasksTask       = HouseService.GetTotalTasksAsync(_connectedUser.HomeId);
+        var countDoneTasksTask   = HouseService.GetTotalDoneTasksAsync(_connectedUser.HomeId);
+        var countAssignedTask    = HouseService.CountAssignedTasksAsync(_connectedUser.UserId);
+        var doneTasksWeekTask    = HouseService.GetRoomsDoneTasksWeekAsync(_connectedUser.HomeId);
+        var assignedTasksTask    = HouseService.GetAssignedTasksAsync(_connectedUser.UserId);
+        var levelingTask         = LevelingService.CalculateLevelAsync(_connectedUser.TotalXp);
+
+        await Task.WhenAll(
+            roomsTask, roomsWithTasksTask, countTasksTask, countDoneTasksTask,
+            countAssignedTask, doneTasksWeekTask, assignedTasksTask, levelingTask
+        );
+
+        _rooms              = roomsTask.Result;
+        _roomsWithTasks     = roomsWithTasksTask.Result;
+        _countTasks         = countTasksTask.Result;
+        _countDoneTasks     = countDoneTasksTask.Result;
+        _countAssignedTasks = countAssignedTask.Result;
+        _roomsWithDoneTasks = doneTasksWeekTask.Result;
+        _assignedTasks      = assignedTasksTask.Result;
+        _levelingUser       = levelingTask.Result;
     }
 
     private void OpenCreateDrawer()
@@ -86,8 +100,8 @@ public partial class Home : ComponentBase
     private async Task ToggleAssignUserToTask((TaskDetailsDto task, UserDto user)  args)
     {
         bool isSameUser = args.task.AssignedUsername == args.user.Username;
-        args.task.AssignedUsername = isSameUser ? null : args.task.AssignedUsername;
-        await HouseService.AssignUserTaskAsync(args.task.TaskId, isSameUser ? null : args.user.UserId);
+        args.task.AssignedUsername = isSameUser ? null : args.user.Username;
+        await HouseService.AssignUserTaskAsync(args.task.TaskId, args.user.HomeId, isSameUser ? null : args.user.UserId);
         await LoadDataAsync();
     }
 
@@ -101,7 +115,7 @@ public partial class Home : ComponentBase
     {
         if (_isEditMode)
         {
-            await HouseService.UpdateTaskAsync(_currentForm);
+            await HouseService.UpdateTaskAsync(_currentForm, _connectedUser!.HomeId);
         }
         else
         {
@@ -114,15 +128,15 @@ public partial class Home : ComponentBase
     
     private async Task RemoveTask()
     {
-        await HouseService.RemoveTaskAsync(_currentForm.Id);
+        await HouseService.RemoveTaskAsync(_currentForm.Id, _connectedUser!.HomeId);
         await LoadDataAsync();
         CloseDrawer();
     }
 
     private async Task ToggleTask(TaskDetailsDto task)
     {
-        await HouseService.ToggleTaskAsync(task.TaskId, task.IsDone);
-        await TaskCompleted(task);
+        await HouseService.ToggleTaskAsync(task.TaskId, task.IsDone, _connectedUser!.HomeId);
+        if (!task.IsDone) await TaskCompleted(task);
         await UserService.UpdateTotalXpUser(_connectedUser.UserId);
         await LoadDataAsync();
     }

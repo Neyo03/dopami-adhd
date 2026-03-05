@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("LifeManager.Tests")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e1036a575015a67b9dbfd7e27b0d6acceab70f3c")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+0317e089b25854653f64696c047c2de5ead2363f")]
 [assembly: System.Reflection.AssemblyProductAttribute("LifeManager.Tests")]
 [assembly: System.Reflection.AssemblyTitleAttribute("LifeManager.Tests")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

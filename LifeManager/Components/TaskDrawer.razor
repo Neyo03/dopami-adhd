@@ -46,122 +46,9 @@
                     <InputTextArea rows="3" class="textarea border-transparent" @bind-Value="CurrentForm.Description"></InputTextArea>
                 </label> 
                 
-                
-                @* <div class="mt-3 flex flex-col justify-start items-start"> *@
-                @*     <b class="mb-3 text-base opacity-50">Temps requis</b> *@
-                @*     <div class="flex items-center gap-3"> *@
-                @*         <InputRadioGroup Name="TaskDuration" @bind-Value="CurrentForm.Duration" > *@
-                @*             @foreach (var item in Enum.GetValues(typeof(TaskDuration))) *@
-                @*             { *@
-                @*                 if (item.Equals(Enum.ToObject(typeof(TaskDuration), 0))) *@
-                @*                 { *@
-                @*                     continue; *@
-                @*                 } *@
-                @*                 <label class="btn bg-base-200 has-checked:bg-primary has-checked:text-white"> *@
-                @*                     <InputRadio class="hidden" Value="@item" @key="@item" />  *@
-                @*                     <span>@item</span> *@
-                @*                 </label> *@
-                @*             } *@
-                @*         </InputRadioGroup> *@
-                @*     </div> *@
-                @* </div> *@
-                @* *@
-                @* <div class="mt-3 flex flex-col justify-start items-start"> *@
-                @*     <b class="mb-3 text-base opacity-50">Energie requise</b> *@
-                @*     <div class="flex items-center gap-3"> *@
-                @*         <InputRadioGroup Name="TaskEnergy" @bind-Value="CurrentForm.Energy" > *@
-                @*             @foreach (var item in Enum.GetValues(typeof(TaskEnergy))) *@
-                @*             { *@
-                @*                 if (item.Equals(Enum.ToObject(typeof(TaskEnergy), 0))) *@
-                @*                 { *@
-                @*                     continue; *@
-                @*                 } *@
-                @*                 <label class="btn bg-base-200 has-checked:bg-primary has-checked:text-white"> *@
-                @*                     <InputRadio class="hidden" Value="@item" @key="@item" />  *@
-                @*                     <span>@item</span> *@
-                @*                 </label> *@
-                @*             } *@
-                @*         </InputRadioGroup> *@
-                @*     </div> *@
-                @* </div> *@
-                @* *@
-                @* <div class="mt-3 flex flex-col justify-start items-start"> *@
-                @*     <b class="mb-3 text-base opacity-50">Impact</b> *@
-                @*     <div class="flex items-center gap-3"> *@
-                @*         <InputRadioGroup Name="TaskImpact" @bind-Value="CurrentForm.Impact" > *@
-                @*             @foreach (var item in Enum.GetValues(typeof(TaskImpact))) *@
-                @*             { *@
-                @*                 if (item.Equals(Enum.ToObject(typeof(TaskImpact), 0))) *@
-                @*                 { *@
-                @*                     continue; *@
-                @*                 } *@
-                @*                 <label class="btn bg-base-200 has-checked:bg-primary has-checked:text-white"> *@
-                @*                     <InputRadio class="hidden" Value="@item" @key="@item" />  *@
-                @*                     <span>@item</span> *@
-                @*                 </label> *@
-                @*             } *@
-                @*         </InputRadioGroup> *@
-                @*     </div> *@
-                @* </div> *@
-                @* *@
-                
                 <RadioGroup Title="Temps requis" Name="taskDuration" TEnum="TaskDuration" @bind-Value="CurrentForm.Duration"/>
                 <RadioGroup Title="Energie requise" Name="taskEnergy" TEnum="TaskEnergy" @bind-Value="CurrentForm.Energy"/>
                 <RadioGroup Title="Impact après effort" Name="taskImpact" TEnum="TaskImpact" @bind-Value="CurrentForm.Impact"/>
-
-                @* <div class="flex gap-8 items-center mt-3"> *@
-                @*     <span class="label w-1/5">Due Date</span> *@
-                @*     <InputDate class="input input-ghost input-xs" @bind-Value="CurrentForm.DueDate" /> *@
-                @* </div> *@
-
-                @* <div class="flex gap-8 items-center mt-2"> *@
-                @*     <span class="label w-1/5">Tags</span> *@
-                @*     <div class="flex flex-wrap items-center gap-2"> *@
-                @*         @foreach (var taskTag in CurrentForm.Tags) *@
-                @*         { *@
-                @*             <span class="badge badge-xs cursor-pointer group flex items-center gap-1 transition-all text-white border-none"  *@
-                @*                   style="background-color: @taskTag.ColorHex"  *@
-                @*                   @onclick="() => RemoveTaskTag(taskTag)"> *@
-                @*                 @taskTag.Label *@
-                @*                 <svg class="w-3 h-3 hidden group-hover:block text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"> *@
-                @*                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /> *@
-                @*                 </svg> *@
-                @*             </span> *@
-                @*         } *@
-                @*         <button type="button" class="badge badge-xs badge-dash badge-info cursor-pointer" popovertarget="popovertags" style="anchor-name:--anchor-1"> *@
-                @*             + Tag *@
-                @*         </button> *@
-                @*     </div> *@
-                @*     <ul class="dropdown menu w-52 rounded-box bg-base-100 shadow-sm text-xs p-2" popover id="popovertags" style="position-anchor:--anchor-1"> *@
-                @*              *@
-                @*         <li class="mb-2"> *@
-                @*             <label class="input input-xs flex items-center gap-2"> *@
-                @*                 <svg class="h-[1em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"> *@
-                @*                     <g stroke-linejoin="round" stroke-linecap="round" stroke-width="2.5" fill="none" stroke="currentColor"> *@
-                @*                         <circle cx="11" cy="11" r="8"></circle> *@
-                @*                         <path d="m21 21-4.3-4.3"></path> *@
-                @*                     </g> *@
-                @*                 </svg> *@
-                @*                 <input type="search" placeholder="Search..." @bind="TagSearchQuery" @bind:event="oninput" /> *@
-                @*             </label> *@
-                @*         </li> *@
-                @*              *@
-                @*         <li><a class="cursor-pointer font-bold text-primary" @onclick="ModalService.Show">Create new tag</a></li> *@
-                @*         <div class="divider mt-1 mb-1"></div> *@
-                @*              *@
-                @*         @foreach (var tag in FilteredTags) *@
-                @*         { *@
-                @*             <li> *@
-                @*                 <span class="cursor-pointer relative" @onclick="() => AddTaskTag(tag)"> <span class="rightshape " style="background-color: @tag.ColorHex" ></span> @tag.Label</span> *@
-                @*             </li> *@
-                @*         } *@
-                @*              *@
-                @*         @if (!FilteredTags.Any()) *@
-                @*         { *@
-                @*             <li class="text-center opacity-50 mt-2">No tags found</li> *@
-                @*         } *@
-                @*     </ul> *@
-                @* </div> *@
 
                 <div class="modal-action mt-8">
                     <button type="button" class="btn btn-secondary btn-xs btn-soft w-1/2" @onclick="OnClose">Cancel</button>
@@ -189,11 +76,11 @@
     
 
     private IEnumerable<Tag> FilteredTags => Tags?
-        .Where(t => !CurrentForm.Tags.Any(ct => ct.Id == t.Id))
+        .Where(t => !CurrentForm.Tags.Any(ct => ct.TagId == t.Id))
         .Where(t => string.IsNullOrWhiteSpace(TagSearchQuery) || t.Label.Contains(TagSearchQuery, StringComparison.OrdinalIgnoreCase)) 
         ?? Array.Empty<Tag>();
 
-    private void AddTaskTag(Tag tag)
+    private void AddTaskTag(TagDto tag)
     {
         CurrentForm.Tags.Add(tag);
         TagSearchQuery = string.Empty;
@@ -201,7 +88,7 @@
 
     private void RemoveTaskTag(Tag tag)
     {
-        var tagToRemove = CurrentForm.Tags.FirstOrDefault(t => t.Id == tag.Id);
+        var tagToRemove = CurrentForm.Tags.FirstOrDefault(t => t.TagId == tag.Id);
         if (tagToRemove != null)
         {
             CurrentForm.Tags.Remove(tagToRemove);

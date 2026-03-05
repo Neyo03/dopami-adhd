@@ -39,6 +39,8 @@ public class UserService(IDbContextFactory<AppDbContext> factory, IHttpContextAc
         int userId =  Convert.ToInt32(httpContext.HttpContext?.User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier)
             ?.Value);
         
+        if (userId == 0) return null;
+        
         return await context.Users.Select(user => new UserDto()
         {
             UserId = user.Id,

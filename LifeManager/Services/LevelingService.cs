@@ -21,7 +21,11 @@ public class LevelingService
             {
                 level = i + 1;
                 currentLevelXp = totalXp - totalXpForNext;
+                
+                if (i + 1 >= _thresholds.Length) break; 
+                
                 xpForNext = _thresholds[i + 1];
+                
             }
             else
             {

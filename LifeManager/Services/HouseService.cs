@@ -1,6 +1,5 @@
 ﻿using LifeManager.Extensions;
 using LifeManager.Model;
-using Microsoft.VisualBasic;
 
 namespace LifeManager.Services;
 
@@ -46,13 +45,20 @@ public class HouseService(IDbContextFactory<AppDbContext> factory)
                         AssignedUsername = task.UserAssigned != null ? task.UserAssigned.Username : null,
                         RoomId = task.RoomId,
                         RoomName = task.Room.Name,
-                        Tags = task.Tags.ToList(),
+                        Tags = task.Tags.Select(tag => new TagDto()
+                        {
+                            HomeId =  tag.HomeId,
+                            ColorHex = tag.ColorHex,
+                            Label =  tag.Label,
+                            TagId = tag.Id
+                        }).ToList(),
                         DueDate = task.DueDate,
                         Description =  task.Description,
                         Energy = task.Energy,
                         Duration =  task.Duration,
                         Impact =  task.Impact,
-                        IsDone = task.IsDone
+                        IsDone = task.IsDone,
+                        XpToEarn = task.XpToEarn,
                     }).ToList()
             })
             .ToListAsync();
@@ -72,10 +78,20 @@ public class HouseService(IDbContextFactory<AppDbContext> factory)
                 AssignedUsername = task.UserAssigned != null ? task.UserAssigned.Username : null,
                 RoomId = task.RoomId,
                 RoomName = task.Room.Name,
-                Tags = task.Tags.ToList(),
+                Tags = task.Tags.Select(tag => new TagDto()
+                {
+                    HomeId =  tag.HomeId,
+                    ColorHex = tag.ColorHex,
+                    Label =  tag.Label,
+                    TagId = tag.Id
+                }).ToList(),
                 DueDate = task.DueDate,
                 Description =  task.Description,
-                IsDone = task.IsDone
+                Energy = task.Energy,
+                Duration =  task.Duration,
+                Impact =  task.Impact,
+                IsDone = task.IsDone,
+                XpToEarn = task.XpToEarn,
             })
             .ToListAsync();
     }
@@ -174,7 +190,7 @@ public class HouseService(IDbContextFactory<AppDbContext> factory)
         
         if (formModel.Tags.Any())
         {
-            var tagIds = formModel.Tags.Select(t => t.Id).ToList();
+            var tagIds = formModel.Tags.Select(t => t.TagId).ToList();
             var trackedTags = await context.Tags.Where(t => tagIds.Contains(t.Id)).ToListAsync();
             newTask.Tags.AddRange(trackedTags);
         }
@@ -183,25 +199,26 @@ public class HouseService(IDbContextFactory<AppDbContext> factory)
         await context.SaveChangesAsync();
     }
     
-    public async Task RemoveTaskAsync(int taskId)
+    public async Task RemoveTaskAsync(int taskId, int userHomeId)
     {
         await using var context = await factory.CreateDbContextAsync();
         
-        // Ultra-fast SQL Delete without loading the entity into RAM
         await context.HouseTasks
-            .Where(t => t.Id == taskId)
+            .Where(t => t.Id == taskId && t.Room.HomeId == userHomeId)
             .ExecuteDeleteAsync();
     }
     
-    public async Task UpdateTaskAsync(TaskFormModel formModel)
+    // Note : contrairement aux autres mutations qui utilisent ExecuteUpdateAsync,
+    // cette méthode charge l'entité en mémoire. C'est intentionnel : EF Core ne permet
+    // pas de gérer la relation many-to-many (Tags) via ExecuteUpdateAsync, car cela
+    // nécessite de manipuler la table de jointure implicite (HouseTaskTag).
+    public async Task UpdateTaskAsync(TaskFormModel formModel, int userHomeId)
     {
-        if (formModel.Id == null) return;
-
         await using var context = await factory.CreateDbContextAsync();
-        
+
         var existingTask = await context.HouseTasks
             .Include(task => task.Tags)
-            .FirstOrDefaultAsync(task => task.Id == formModel.Id);
+            .FirstOrDefaultAsync(task => task.Id == formModel.Id && task.Room.HomeId == userHomeId);
 
         if (existingTask != null)
         {
@@ -215,7 +232,7 @@ public class HouseService(IDbContextFactory<AppDbContext> factory)
             existingTask.Energy = formModel.Energy;
             
             existingTask.Tags.Clear();
-            var tagIds = formModel.Tags.Select(t => t.Id).ToList();
+            var tagIds = formModel.Tags.Select(t => t.TagId).ToList();
             var trackedTags = await context.Tags.Where(t => tagIds.Contains(t.Id)).ToListAsync();
             existingTask.Tags.AddRange(trackedTags);
             
@@ -242,12 +259,12 @@ public class HouseService(IDbContextFactory<AppDbContext> factory)
         await context.SaveChangesAsync();
     }
     
-    public async Task ToggleTaskAsync(int taskId, bool toggleTask)
+    public async Task ToggleTaskAsync(int taskId, bool toggleTask, int userHomeId)
     {
         await using var context = await factory.CreateDbContextAsync();
         
         await context.HouseTasks
-            .Where(task => task.Id == taskId)
+            .Where(task => task.Id == taskId && task.Room.HomeId == userHomeId)
             .ExecuteUpdateAsync(
                 setters => 
                     setters
@@ -256,12 +273,12 @@ public class HouseService(IDbContextFactory<AppDbContext> factory)
                     );
     }
     
-    public async Task AssignUserTaskAsync(int taskId, int? userId)
+    public async Task AssignUserTaskAsync(int taskId, int userHomeId, int? userId)
     {
         await using var context = await factory.CreateDbContextAsync();
         
         await context.HouseTasks
-            .Where(task => task.Id == taskId)
+            .Where(task => task.Id == taskId && task.Room.HomeId == userHomeId)
             .ExecuteUpdateAsync(setters => setters.SetProperty(t => t.UserAssignedId, userId));
     }
     

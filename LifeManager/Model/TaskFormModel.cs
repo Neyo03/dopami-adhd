@@ -19,7 +19,7 @@ public class TaskFormModel
     public int RoomId { get; set; }
     
     public bool IsDone { get; set; }
-    public List<Tag> Tags { get; set; } = new();
+    public List<TagDto> Tags { get; set; } = new();
     
     public TaskDuration Duration { get; set; }
     public TaskEnergy Energy { get; set; }

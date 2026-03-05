@@ -13,9 +13,11 @@ public class TaskDetailsDto
     public string? AssignedUsername { get; set; }
     public int RoomId { get; set; }
     public string RoomName { get; set; } = string.Empty;
-    public List<Tag> Tags { get; set; } = new();
+    public List<TagDto> Tags { get; set; } = new();
     
     public TaskDuration Duration { get; set; }
     public TaskEnergy Energy { get; set; }
     public TaskImpact Impact { get; set; }
+    
+    public int XpToEarn { get; set; } = 0;
 }
