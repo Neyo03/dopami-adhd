@@ -7,52 +7,57 @@
 <div class="drawer drawer-end">
     <input id="my-drawer-1" type="checkbox" class="drawer-toggle" checked="@IsOpen" readonly />
 
-    <div class="drawer-side">
+    <div class="drawer-side z-50">
         <label for="my-drawer-1" class="drawer-overlay" @onclick="OnClose"></label>
         <div class="menu bg-base-100 min-h-full w-full sm:w-96 lg:w-1/3 p-4">
             
-            <h2 class="text-2xl mb-4">@(IsEditMode ? $"Edit {CurrentForm.Title}" : "Add Task")</h2>
+            <div class="px-4 pt-4 pb-2">
+                <h2 class="text-2xl mb-2">@(IsEditMode ? $"Modifier {CurrentForm.Title}" : "Ajouter micro tâche")</h2>
+                @if (IsEditMode)
+                {
+                    <span class="text-xs link text-error/50" @onclick="OnDelete">Supprimer</span>
+                }
+            </div>
 
-            @if (IsEditMode)
-            {
-                <span class="text-xs link text-error/50" @onclick="OnDelete">Supprimer</span>
-            }
-            
-            <EditForm Model="CurrentForm" OnValidSubmit="() => OnSave.InvokeAsync(CurrentForm)" class="col-10 mt-5 w-full">
+            <!-- Form : prend l'espace restant -->
+            <EditForm Model="CurrentForm" OnValidSubmit="() => OnSave.InvokeAsync(CurrentForm)" class="flex flex-col flex-1 p-4">
                 <DataAnnotationsValidator />
                 <ValidationSummary class="text-error text-sm mb-4" />
-                
-                <label class="floating-label"> 
-                    <span>Room</span>
-                    <InputSelect class="select" @bind-Value="CurrentForm.RoomId">
-                        <option value="0">Select a room</option>
-                        @if (Rooms != null)
-                        {
-                            @foreach (var room in Rooms)
+
+                <!-- Zone scrollable -->
+                <div class="flex-1 overflow-y-auto min-h-0 pb-2">
+                    <label>
+                        <span>Room</span>
+                        <InputSelect class="select" @bind-Value="CurrentForm.RoomId">
+                            <option value="0">Select a room</option>
+                            @if (Rooms != null)
                             {
-                                <option value="@room.RoomId">@room.RoomName</option>
+                                @foreach (var room in Rooms)
+                                {
+                                    <option value="@room.RoomId">@room.RoomName</option>
+                                }
                             }
-                        }
-                    </InputSelect>
-                </label>
+                        </InputSelect>
+                    </label>
 
-                <label class="floating-label mt-3">
-                    <span>Title</span>
-                    <InputText class="input input-ghost" @bind-Value="CurrentForm.Title"/>
-                </label>
-                
-                <label class="floating-label mt-3">
-                    <span>Description</span>
-                    <InputTextArea rows="3" class="textarea border-transparent" @bind-Value="CurrentForm.Description"></InputTextArea>
-                </label> 
-                
-                <RadioGroup Title="Temps requis" Name="taskDuration" TEnum="TaskDuration" @bind-Value="CurrentForm.Duration"/>
-                <RadioGroup Title="Energie requise" Name="taskEnergy" TEnum="TaskEnergy" @bind-Value="CurrentForm.Energy"/>
-                <RadioGroup Title="Impact après effort" Name="taskImpact" TEnum="TaskImpact" @bind-Value="CurrentForm.Impact"/>
+                    <label class="floating-label mt-3">
+                        <span>Title</span>
+                        <InputText class="input input-ghost" @bind-Value="CurrentForm.Title"/>
+                    </label>
 
-                <div class="modal-action mt-8">
-                    <button type="button" class="btn btn-secondary btn-xs btn-soft w-1/2" @onclick="OnClose">Cancel</button>
-                    <button type="submit" class="btn btn-primary btn-soft btn-xs w-1/2">@(IsEditMode ? "Update" : "Save")</button>
+                    <label class="floating-label mt-3">
+                        <span>Description</span>
+                        <InputTextArea rows="3" class="textarea border-transparent" @bind-Value="CurrentForm.Description"></InputTextArea>
+                    </label>
+
+                    <RadioGroup Title="Temps requis" Name="taskDuration" TEnum="TaskDuration" @bind-Value="CurrentForm.Duration"/>
+                    <RadioGroup Title="Energie requise" Name="taskEnergy" TEnum="TaskEnergy" @bind-Value="CurrentForm.Energy"/>
+                    <RadioGroup Title="Impact après effort" Name="taskImpact" TEnum="TaskImpact" @bind-Value="CurrentForm.Impact"/>
+                </div>
+                
+                <div class="sm:flex-col flex gap-2 py-3 lg:pb-4 border-t border-base-content/10">
+                    <button type="button" class="btn btn-secondary btn-sm btn-soft w-1/2" @onclick="OnClose">Cancel</button>
+                    <button type="submit" class="btn btn-primary btn-soft btn-sm w-1/2">@(IsEditMode ? "Update" : "Save")</button>
                 </div>
             </EditForm>
         </div>
