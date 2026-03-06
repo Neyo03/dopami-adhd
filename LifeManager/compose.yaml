@@ -20,7 +20,7 @@
       - lifemanager-net
 
   lifemanager-migration:
-    image: ghcr.io/Neyo03/dopami-adhd:latest
+    image: ghcr.io/neyo03/dopami-adhd:latest
     container_name: lifemanager_migration
     entrypoint: ["./efbundle", "--connection", "Host=lifemanager-db;Database=lifemanager;Username=postgres;Password=YourStrongPassword123!"]
     depends_on:
@@ -30,7 +30,7 @@
       - lifemanager-net
 
   lifemanager-app:
-    image: ghcr.io/Neyo03/dopami-adhd:latest
+    image: ghcr.io/neyo03/dopami-adhd:latest
     container_name: lifemanager_app
     environment:
       - ConnectionStrings__DefaultConnection=Host=lifemanager-db;Database=lifemanager;Username=postgres;Password=YourStrongPassword123!
