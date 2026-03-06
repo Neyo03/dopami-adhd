@@ -11,10 +11,10 @@
 @rendermode InteractiveServer
 
 
-<div class="flex justify-center items-center w-full flex-col mb-5">
-    <h1 class="text-5xl">Home Cleaner</h1>
-    <small>Une micro-tâche à la fois, sans pression</small>
-</div>
+@* <div class="flex justify-center items-center w-full flex-col mb-5"> *@
+@*     <h1 class="text-5xl">Home Cleaner</h1> *@
+@*     <small>Une micro-tâche à la fois, sans pression</small> *@
+@* </div> *@
 
 
 @if (_rooms == null || _roomsWithTasks == null)
@@ -24,14 +24,14 @@
 else
 {
     <div class="w-full flex justify-center gap-3 mb-5">
-        <div class="bg-primary flex justify-center items-center p-5 rounded-lg text-neutral-content shadow-2xl text-xl cursor-pointer w-50 h-25"
+        <div class="bg-primary flex justify-center shadow-primary drop-shadow-primary/50 drop-shadow-xl items-center p-5 rounded-xl text-neutral-content text-xl cursor-pointer w-44 h-20"
                @onclick="OpenCreateDrawer">
-            + Tâche
+            + Ajouter
         </div>
     </div>
     
-    <div class="flex gap-3 items-start">
-        <div class="flex gap-2 flex-col w-1/5">
+    <div class="flex flex-col lg:flex-row gap-3 items-start">
+        <div class="flex gap-2 flex-col w-full lg:w-1/5">
             
             <div>
                 <b class="text-xl w-full flex justify-between items-end"><small class="opacity-50 text-xs">Tâches</small> </b> 
@@ -58,7 +58,7 @@ else
                 </div>
             </div>
         </div>
-        <div class="w-2/4">
+        <div class="w-full lg:w-2/4">
             <b class="text-xl w-full flex justify-between items-end"><small class="opacity-50 text-xs">Progression</small> </b> 
             <div class="card border p-5">
                 <div class="rounded-t-xl mb-5 mt-5">
@@ -111,7 +111,7 @@ else
                 </div>
             </div>
         </div>
-        <div class="w-1/5">
+        <div class="w-full lg:w-1/5">
             <b class="text-xl w-full flex justify-between items-end"><small class="opacity-50 text-xs"> Micro-tâches</small> @_countAssignedTasks / 3  </b> 
             <div class="flex gap-2 flex-col ">
 
@@ -120,9 +120,6 @@ else
                     foreach (var assignedTask in _assignedTasks)
                     {
                         <div class="card border p-5">
-                            <h5 class="flex justify-end w-full text-primary-content">
-                                <kbd class="kbd">+ @assignedTask.XpToEarn pts</kbd>
-                            </h5>
                             <h3>
                                 @assignedTask.Title <small class="text-xs opacity-50">@assignedTask.RoomName</small>
                             </h3>
@@ -134,7 +131,7 @@ else
                             @* } *@
 
                             <small class="text-xs opacity-50 mt-3 mb-2 break-all wrap-break-word">@(assignedTask.Description.IsNullOrEmpty() ? "Empty description." : assignedTask.Description)</small>
-                            <button class="w-full btn bg-primary" @onclick="() => ToggleTask(assignedTask)">Enfin fini ! </button>
+                            <button class="w-full btn bg-primary" @onclick="() => ToggleTask(assignedTask)">C'est fait ! (+ @assignedTask.XpToEarn pts)</button>
                             <small class="w-full flex justify-center text-xs opacity-50 link" @onclick="() => ToggleAssignUserToTask((assignedTask,  _connectedUser
                             ))">Ne plus la faire</small>
                         </div>
