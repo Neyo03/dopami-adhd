@@ -1,45 +1,68 @@
-﻿@inherits LayoutComponentBase
+@inherits LayoutComponentBase
 
+<div class="drawer lg:drawer-open">
+    <input id="main-drawer" type="checkbox" class="drawer-toggle" />
 
-    
-<div class="page">
-    <AuthorizeView>
-        <Authorized>
-            <div class="sidebar">
-                <NavMenu/>
+    <div class="drawer-content flex flex-col min-h-screen bg-base-300">
+        <!-- Navbar -->
+        <div class="navbar bg-base-200 sticky top-0 z-30 shadow-sm">
+            <div class="flex-1 lg:hidden">
+                <span class="text-xl font-bold px-2 flex gap-1 items-center"> <div class="w-10 h-10 flex items-center"><img src="logo.png"/></div> Dopami</span>
             </div>
-        </Authorized>
-    </AuthorizeView>
-    <main>
-        
-        <AuthorizeView>
-            <Authorized>
-                <div class="navbar flex justify-between">
-                    <div>
-                    </div>
-                    <div>
+            <div class="flex-1 hidden lg:block"></div>
+            <AuthorizeView>
+                <Authorized>
+                    <div class="flex-none pr-2">
                         <div class="avatar avatar-placeholder">
                             <div class="bg-neutral text-neutral-content w-12 rounded-full">
                                 <span class="text-sm">N</span>
                             </div>
                         </div>
                     </div>
-                </div>
-            </Authorized>
-        </AuthorizeView>
-        
+                </Authorized>
+            </AuthorizeView>
+        </div>
 
-        <article class="content px-4">
+        <article class="content px-4 pb-28 lg:pb-4 bg-base-300">
             @Body
         </article>
 
-        <TagModal/>
-    </main>
+        <TagModal />
+    </div>
+
+    <AuthorizeView>
+        <Authorized>
+            <div class="drawer-side z-40">
+                <label for="main-drawer" class="drawer-overlay"></label>
+                <NavMenu />
+            </div>
+        </Authorized>
+    </AuthorizeView>
 </div>
 
-        <div id="blazor-error-ui" data-nosnippet>
-            An unhandled error has occurred.
-            <a href="." class="reload">Reload</a>
-            <span class="dismiss">🗙</span>
+<AuthorizeView>
+    <Authorized>
+        <div class="fixed lg:hidden z-50 w-full" style="bottom: 0">
+            <div class="bg-base-100 rounded-t-xl shadow-xl border border-base-content/10 flex items-center justify-around px-6 py-3">
+                <NavLink href="" Match="NavLinkMatch.All" class="bottom-nav-item">
+                    <svg class="w-6 h-6" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+                        <path fill-rule="evenodd" d="M11.293 3.293a1 1 0 0 1 1.414 0l6 6 2 2a1 1 0 0 1-1.414 1.414L19 12.414V19a2 2 0 0 1-2 2h-3a1 1 0 0 1-1-1v-3h-2v3a1 1 0 0 1-1 1H7a2 2 0 0 1-2-2v-6.586l-.293.293a1 1 0 0 1-1.414-1.414l2-2 6-6Z" clip-rule="evenodd"/>
+                    </svg>
+                    <span class="text-xs font-medium">Dashboard</span>
+                </NavLink>
+                <NavLink href="rooms" class="bottom-nav-item">
+                    <svg class="w-6 h-6" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+                        <path fill-rule="evenodd" d="M4 4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2H4Zm0 8h6v6H4v-6Zm8 6v-6h8v6h-8Zm8-8H4V6h16v4Z" clip-rule="evenodd"/>
+                    </svg>
+                    <span class="text-xs font-medium">Pièces</span>
+                </NavLink>
+            </div>
         </div>
-    
+    </Authorized>
+</AuthorizeView>
+
+<div id="blazor-error-ui" data-nosnippet>
+    An unhandled error has occurred.
+    <a href="." class="reload">Reload</a>
+    <span class="dismiss">🗙</span>
+</div>

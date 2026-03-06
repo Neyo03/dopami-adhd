@@ -8,7 +8,7 @@
     }
     <ul class="timeline timeline-vertical timeline-completed-task timeline-snap-icon">
         @{ int competedTaskIndex = 0; }
-        @foreach (var dailyUserTasks in CompletedTasks)
+        @foreach (var dailyUserTasks in CompletedTasks ?? [])
         {
 
             <li @key="dailyUserTasks.Date">
@@ -24,7 +24,7 @@
                     </button>
                 </div>
                 <div class="timeline-end">
-                    <span>@dailyUserTasks.Username à fait @dailyUserTasks.Tasks.Count tâche(s) @dailyUserTasks.DateFormat</span>
+                    <span>@dailyUserTasks.Username <small>à fait <b>@dailyUserTasks.Tasks.Count</b> tâche(s) @dailyUserTasks.Date.ToString("dd/MM")</small></span>
                     @foreach (var task in dailyUserTasks.Tasks)
                     {
                         <div class="w-full flex justify-between items-center p-1 ps-2">

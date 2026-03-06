@@ -1,4 +1,4 @@
-﻿@using LifeManager.Data
+@using LifeManager.Data
 @using LifeManager.Model
 @using LifeManager.Services
 @using LifeManager.State
@@ -8,38 +8,30 @@
 @inject UserService UserService
 @rendermode InteractiveServer
 
-<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">LifeManager</a>
+<aside class="bg-base-200 w-64 min-h-screen p-4">
+    <div class="mb-6 px-2">
+        <span class="text-xl font-bold flex gap-1 items-center "> <div class="w-10 h-10 flex items-center"><img src="logo.png"/></div> Dopami</span>
     </div>
-</div>
-
-<input type="checkbox" title="Navigation menu" class="navbar-toggler"/>
-
-<div onclick="document.querySelector('.navbar-toggler').click()">
-    <nav class="menu w-full p-0">
-        
-        <div class="nav-item">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <svg class="w-4 h-4 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+    <ul class="menu w-full p-0">
+        <li>
+            <NavLink class="text-white" href="" Match="NavLinkMatch.All">
+                <svg class="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
                     <path fill-rule="evenodd" d="M11.293 3.293a1 1 0 0 1 1.414 0l6 6 2 2a1 1 0 0 1-1.414 1.414L19 12.414V19a2 2 0 0 1-2 2h-3a1 1 0 0 1-1-1v-3h-2v3a1 1 0 0 1-1 1H7a2 2 0 0 1-2-2v-6.586l-.293.293a1 1 0 0 1-1.414-1.414l2-2 6-6Z" clip-rule="evenodd"/>
                 </svg>
                 Dashboard
             </NavLink>
-        </div>
-
-
-        <div class="nav-item">
-            <NavLink class="nav-link" href="rooms">
+        </li>
+        <li>
+            <NavLink class="text-white" href="rooms">
                 Pièces
             </NavLink>
-        </div>
-    </nav>
-</div>
+        </li>
+    </ul>
+</aside>
 
 @code {
     private UserDto? _connectedUser;
-    
+
     protected override async Task OnInitializedAsync()
     {
         _connectedUser = await UserService.GetAuthenticatedUserAsync();

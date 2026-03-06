@@ -128,6 +128,7 @@ public partial class Home : ComponentBase
 
     private async Task ToggleTask(TaskDetailsDto task)
     {
+        // task.IsDone is the state BEFORE toggle — false means it's being completed now
         await HouseService.ToggleTaskAsync(task.TaskId, task.IsDone, _connectedUser!.HomeId);
         if (!task.IsDone) await TaskCompleted(task);
         await UserService.UpdateTotalXpUser(_connectedUser.UserId);
@@ -141,7 +142,7 @@ public partial class Home : ComponentBase
             CompletedAt = DateTime.UtcNow,
             HouseTaskId = task.TaskId,
             CompletedById = _connectedUser!.UserId,
-            XpEarned = 10,
+            XpEarned = task.XpToEarn,
         };
 
         await HouseService.CreateTaskCompletionAsync(taskCompletionModel);
