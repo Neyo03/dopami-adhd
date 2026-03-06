@@ -60,7 +60,7 @@ public class HouseService(IDbContextFactory<AppDbContext> factory)
                         AssignedUsername = task.UserAssigned != null ? task.UserAssigned.Username : null,
                         RoomId = task.RoomId,
                         RoomName = task.Room.Name,
-                        Tags = task.Tags.Select(ToTagDto).ToList(),
+                        Tags = task.Tags.Select(tag => new TagDto { TagId = tag.Id, Label = tag.Label, ColorHex = tag.ColorHex, HomeId = tag.HomeId }).ToList(),
                         DueDate = task.DueDate,
                         Description =  task.Description,
                         Energy = task.Energy,
@@ -72,11 +72,11 @@ public class HouseService(IDbContextFactory<AppDbContext> factory)
             })
             .ToListAsync();
     }
-    
+
     public async Task<List<TaskDetailsDto>> GetAssignedTasksAsync(int userId)
     {
         await using var context = await factory.CreateDbContextAsync();
-        
+
         return await context.HouseTasks
             .AsNoTracking()
             .Where(task => task.UserAssignedId == userId && !task.IsDone)
@@ -87,7 +87,7 @@ public class HouseService(IDbContextFactory<AppDbContext> factory)
                 AssignedUsername = task.UserAssigned != null ? task.UserAssigned.Username : null,
                 RoomId = task.RoomId,
                 RoomName = task.Room.Name,
-                Tags = task.Tags.Select(ToTagDto).ToList(),
+                Tags = task.Tags.Select(tag => new TagDto { TagId = tag.Id, Label = tag.Label, ColorHex = tag.ColorHex, HomeId = tag.HomeId }).ToList(),
                 DueDate = task.DueDate,
                 Description =  task.Description,
                 Energy = task.Energy,
@@ -310,11 +310,4 @@ public class HouseService(IDbContextFactory<AppDbContext> factory)
             .ExecuteDeleteAsync();
     }
 
-    private static readonly Func<Tag, TagDto> ToTagDto = tag => new TagDto
-    {
-        HomeId   = tag.HomeId,
-        ColorHex = tag.ColorHex,
-        Label    = tag.Label,
-        TagId    = tag.Id
-    };
 }

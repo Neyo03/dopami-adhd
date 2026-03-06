@@ -3,9 +3,9 @@
     image: postgres:15-alpine
     container_name: lifemanager_db
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: YourStrongPassword123!
-      POSTGRES_DB: lifemanager
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
     volumes:
       - pgdata:/var/lib/postgresql/data
     ports:
@@ -22,7 +22,7 @@
   lifemanager-migration:
     image: ghcr.io/neyo03/dopami-adhd:latest
     container_name: lifemanager_migration
-    entrypoint: ["./efbundle", "--connection", "Host=lifemanager-db;Database=lifemanager;Username=postgres;Password=YourStrongPassword123!"]
+    entrypoint: ["./efbundle", "--connection", "Host=lifemanager-db;Database=${DB_NAME};Username=${DB_USER};Password=${DB_PASSWORD}"]
     depends_on:
       lifemanager-db:
         condition: service_healthy
@@ -33,7 +33,8 @@
     image: ghcr.io/neyo03/dopami-adhd:latest
     container_name: lifemanager_app
     environment:
-      - ConnectionStrings__DefaultConnection=Host=lifemanager-db;Database=lifemanager;Username=postgres;Password=YourStrongPassword123!
+      - ConnectionStrings__DefaultConnection=Host=lifemanager-db;Database=${DB_NAME};Username=${DB_USER};Password=${DB_PASSWORD}
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
     ports:
       - "8080:8080"
     depends_on:
