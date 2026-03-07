@@ -286,4 +286,4 @@ C:\Users\wagner\Desktop\www\dotnet\LifeManager\LifeManager\bin\Debug\net10.0\BCr
 C:\Users\wagner\Desktop\www\dotnet\LifeManager\LifeManager\obj\Debug\net10.0\compressed\ae6nzw326z-{0}-5cu3kjsmp3-5cu3kjsmp3.gz
 C:\Users\wagner\Desktop\www\dotnet\LifeManager\LifeManager\obj\Debug\net10.0\compressed\h010lxqerd-{0}-5cu3kjsmp3-5cu3kjsmp3.gz
 C:\Users\wagner\Desktop\www\dotnet\LifeManager\LifeManager\obj\Debug\net10.0\compressed\vazeon065p-{0}-ot4v2x0a1g-ot4v2x0a1g.gz
-C:\Users\wagner\Desktop\www\dotnet\LifeManager\LifeManager\obj\Debug\net10.0\compressed\75f7h6puoa-{0}-tl1sugpmeu-tl1sugpmeu.gz
+C:\Users\wagner\Desktop\www\dotnet\LifeManager\LifeManager\obj\Debug\net10.0\compressed\75f7h6puoa-{0}-8rqnenqtth-8rqnenqtth.gz

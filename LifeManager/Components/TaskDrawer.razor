@@ -18,18 +18,16 @@
                     <span class="text-xs link text-error/50" @onclick="OnDelete">Supprimer</span>
                 }
             </div>
-
-            <!-- Form : prend l'espace restant -->
+            
             <EditForm Model="CurrentForm" OnValidSubmit="() => OnSave.InvokeAsync(CurrentForm)" class="flex flex-col flex-1 p-4">
                 <DataAnnotationsValidator />
                 <ValidationSummary class="text-error text-sm mb-4" />
-
-                <!-- Zone scrollable -->
-                <div class="flex-1 overflow-y-auto min-h-0 pb-2">
+                
+                <div class="flex-1 overflow-y-auto min-h-0 p-3">
                     <label>
                         <span>Room</span>
                         <InputSelect class="select" @bind-Value="CurrentForm.RoomId">
-                            <option value="0">Select a room</option>
+                            <option value="0">Séléctionner une pièce</option>
                             @if (Rooms != null)
                             {
                                 @foreach (var room in Rooms)
@@ -39,25 +37,26 @@
                             }
                         </InputSelect>
                     </label>
-
-                    <label class="floating-label mt-3">
-                        <span>Title</span>
-                        <InputText class="input input-ghost" @bind-Value="CurrentForm.Title"/>
-                    </label>
-
-                    <label class="floating-label mt-3">
-                        <span>Description</span>
-                        <InputTextArea rows="3" class="textarea border-transparent" @bind-Value="CurrentForm.Description"></InputTextArea>
-                    </label>
+                    
+                    <fieldset class="fieldset">
+                        <legend class="fieldset-legend">Title</legend>
+                        <InputText class="input border-b-2 border-0" @bind-Value="CurrentForm.Title" placeholder="Ex: Ranger chambre"/>
+                    </fieldset>
+                    
+                    <fieldset class="fieldset">
+                        <legend class="fieldset-legend">Description</legend>
+                        <InputTextArea rows="3" class="textarea grow" @bind-Value="CurrentForm.Description"></InputTextArea>
+                        <p class="label">Optional</p>
+                    </fieldset>
 
                     <RadioGroup Title="Temps requis" Name="taskDuration" TEnum="TaskDuration" @bind-Value="CurrentForm.Duration"/>
                     <RadioGroup Title="Energie requise" Name="taskEnergy" TEnum="TaskEnergy" @bind-Value="CurrentForm.Energy"/>
                     <RadioGroup Title="Impact après effort" Name="taskImpact" TEnum="TaskImpact" @bind-Value="CurrentForm.Impact"/>
                 </div>
                 
-                <div class="sm:flex-col flex gap-2 py-3 lg:pb-4 border-t border-base-content/10">
-                    <button type="button" class="btn btn-secondary btn-sm btn-soft w-1/2" @onclick="OnClose">Cancel</button>
-                    <button type="submit" class="btn btn-primary btn-soft btn-sm w-1/2">@(IsEditMode ? "Update" : "Save")</button>
+                <div class="flex-col flex lg:flex-row gap-2 py-3 lg:pb-4 border-t border-base-content/10">
+                    <button type="button" class="btn btn-secondary btn-sm btn-soft w-full lg:w-1/2" @onclick="OnClose">Cancel</button>
+                    <button type="submit" class="btn btn-primary btn-soft btn-sm w-full lg:w-1/2">@(IsEditMode ? "Update" : "Save")</button>
                 </div>
             </EditForm>
         </div>

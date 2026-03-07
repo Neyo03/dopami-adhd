@@ -24,7 +24,7 @@
                         {
                             <li>
                                 <div class="flex justify-between items-center border-b border-base-content/50 p-2 w-full">
-                                    <div @key="task.TaskId" class="flex gap-3 items-center">
+                                    <div @key="task.TaskId" class="flex gap-3 items-center w-full">
                                         @* <input type="checkbox" class="checkbox checkbox-xs mr-1" checked="@task.IsDone" *@
                                         @*        @onchange="() => OnToggleTask.InvokeAsync(task)"/> *@
                                         @if (task.AssignedUsername != null)
@@ -51,14 +51,18 @@
                                             }
                                         
                                         </ul>
-                                        
-                                        <div class="flex flex-col">
-                                            @task.Title
-                                        
-                                            <p class=" text-xs text-neutral-content/80 break-all text-wrap ">
-                                                @task.Description.Truncate(15)
-                                            </p>
+                                        <div class="w-full flex justify-between items-center">
+                                            <div class="flex flex-col">
+                                                @task.Title.Truncate(15)
+                                                <p class=" text-xs text-neutral-content/80 break-all text-wrap ">
+                                                    @task.Description.Truncate(15)
+                                                </p>
+                                            </div>
+                                            <div class="indicator">
+                                                <span class="indicator-item text-primary text-xs"> + @task.XpToEarn</span>
+                                            </div>
                                         </div>
+                                        
                                     </div>
                                     <svg @onclick="() => OnEditTask.InvokeAsync(task)" class="cursor-pointer ml-2 w-5 h-5 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
                                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m10 16 4-4-4-4"/>

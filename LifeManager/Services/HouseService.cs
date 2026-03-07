@@ -172,7 +172,7 @@ public class HouseService(IDbContextFactory<AppDbContext> factory)
     }
 
     // Ajouter une tâche
-    public async Task AddTaskAsync(TaskFormModel formModel)
+    public async Task AddTaskAsync(TaskFormModel formModel, int calculateXp)
     {
         await using var context = await factory.CreateDbContextAsync();
         
@@ -189,6 +189,7 @@ public class HouseService(IDbContextFactory<AppDbContext> factory)
             Impact = formModel.Impact,
             Energy =  formModel.Energy,
             Duration =  formModel.Duration,
+            XpToEarn = calculateXp,
         };
         
         if (formModel.Tags.Any())
@@ -215,7 +216,7 @@ public class HouseService(IDbContextFactory<AppDbContext> factory)
     // cette méthode charge l'entité en mémoire. C'est intentionnel : EF Core ne permet
     // pas de gérer la relation many-to-many (Tags) via ExecuteUpdateAsync, car cela
     // nécessite de manipuler la table de jointure implicite (HouseTaskTag).
-    public async Task UpdateTaskAsync(TaskFormModel formModel, int userHomeId)
+    public async Task UpdateTaskAsync(TaskFormModel formModel, int userHomeId, int calculateXp)
     {
         await using var context = await factory.CreateDbContextAsync();
 
@@ -233,6 +234,7 @@ public class HouseService(IDbContextFactory<AppDbContext> factory)
             existingTask.Duration = formModel.Duration;
             existingTask.Impact = formModel.Impact;
             existingTask.Energy = formModel.Energy;
+            existingTask.XpToEarn = calculateXp;
             
             existingTask.Tags.Clear();
             var tagIds = formModel.Tags.Select(t => t.TagId).ToList();
