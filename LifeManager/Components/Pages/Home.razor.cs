@@ -1,4 +1,5 @@
 ﻿using LifeManager.Data;
+using LifeManager.Extensions;
 using LifeManager.Model;
 using Microsoft.AspNetCore.Components;
 
@@ -106,13 +107,15 @@ public partial class Home : ComponentBase
 
     private async Task SaveTask()
     {
+        var calculateXp = _currentForm.Energy.GetXp() + _currentForm.Duration.GetXp() + _currentForm.Impact.GetXp(); 
+        
         if (_isEditMode)
         {
-            await HouseService.UpdateTaskAsync(_currentForm, _connectedUser!.HomeId);
+            await HouseService.UpdateTaskAsync(_currentForm, _connectedUser!.HomeId, calculateXp);
         }
         else
         {
-            await HouseService.AddTaskAsync(_currentForm);
+            await HouseService.AddTaskAsync(_currentForm, calculateXp);
         }
         
         await LoadDataAsync();

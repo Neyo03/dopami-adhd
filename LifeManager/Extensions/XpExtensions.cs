@@ -2,26 +2,27 @@
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Reflection;
+using LifeManager.Attributes;
 
 namespace LifeManager.Extensions;
 
-public static class EnumExtensions
+public static class XpExtensions
 {
-    public static string GetDisplayName(this Enum enumValue)
+    public static int GetXp(this Enum enumValue)
     {
         var type = enumValue.GetType();
         var memberInfo = type.GetMember(enumValue.ToString()).FirstOrDefault();
 
         if (memberInfo != null)
         {
-            var displayAttribute = memberInfo.GetCustomAttribute<DisplayAttribute>();
-            if (displayAttribute != null)
+            var xpAttribute = memberInfo.GetCustomAttribute<XpValueAttribute>();
+            if (xpAttribute != null)
             {
-                return displayAttribute.Name ?? enumValue.ToString();
+                return xpAttribute.Xp;
             }
         }
         
-        return enumValue.ToString();
+        return 0;
     }
     
 }
