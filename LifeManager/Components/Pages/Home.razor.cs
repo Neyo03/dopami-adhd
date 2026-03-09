@@ -151,6 +151,7 @@ public partial class Home : ComponentBase
             ToastService.Show("Tâche remise en attente", ToastType.Info);
         }
         await UserService.UpdateTotalXpUser(_connectedUser!.UserId);
+        _connectedUser = await UserService.GetAuthenticatedUserAsync();
         await LoadDataAsync();
     }
     
