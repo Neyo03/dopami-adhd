@@ -17,7 +17,17 @@
                        value="@item.ToString()" 
                        @onchange="() => OnSelectionChangedAsync(item)" />
                        
-                <span>@item.GetDisplayName()</span>
+                <div class="indicator">
+                    @{
+                        if (isChecked)
+                        {
+                            <span class="indicator-item text-success"> + @item.GetXp()</span>
+                        }
+                    }
+                    
+                    <span>@item.GetDisplayName() </span>
+                </div>
+                
             </label>
         }
     </div>

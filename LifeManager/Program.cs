@@ -31,6 +31,7 @@ builder.Services.AddScoped<LevelingService>();
 builder.Services.AddScoped<TagService>();
 builder.Services.AddScoped<TagStateService>();
 builder.Services.AddScoped<TagModalStateService>();
+builder.Services.AddScoped<ToastService>();
 
 
 var app = builder.Build();

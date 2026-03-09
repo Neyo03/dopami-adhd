@@ -1,5 +1,7 @@
 ﻿using LifeManager.Data;
+using LifeManager.Extensions;
 using LifeManager.Model;
+using LifeManager.State;
 using Microsoft.AspNetCore.Components;
 
 namespace LifeManager.Components.Pages;
@@ -90,11 +92,15 @@ public partial class Home : ComponentBase
         _isDrawerOpen = true;
     }
     
-    private async Task ToggleAssignUserToTask((TaskDetailsDto task, UserDto user)  args)
+    private async Task ToggleAssignUserToTask((TaskDetailsDto task, UserDto user) args)
     {
         bool isSameUser = args.task.AssignedUsername == args.user.Username;
         args.task.AssignedUsername = isSameUser ? null : args.user.Username;
         await HouseService.AssignUserTaskAsync(args.task.TaskId, args.user.HomeId, isSameUser ? null : args.user.UserId);
+        if (isSameUser)
+            ToastService.Show($"Assignation retirée", ToastType.Info);
+        else
+            ToastService.Show($"Tâche assignée à {args.user.Username}", ToastType.Info);
         await LoadDataAsync();
     }
 
@@ -106,22 +112,27 @@ public partial class Home : ComponentBase
 
     private async Task SaveTask()
     {
+        var calculateXp = _currentForm.Energy.GetXp() + _currentForm.Duration.GetXp() + _currentForm.Impact.GetXp();
+
         if (_isEditMode)
         {
-            await HouseService.UpdateTaskAsync(_currentForm, _connectedUser!.HomeId);
+            await HouseService.UpdateTaskAsync(_currentForm, _connectedUser!.HomeId, calculateXp);
+            ToastService.Show($"Tâche modifiée");
         }
         else
         {
-            await HouseService.AddTaskAsync(_currentForm);
+            await HouseService.AddTaskAsync(_currentForm, calculateXp);
+            ToastService.Show($"Tâche ajoutée");
         }
-        
+
         await LoadDataAsync();
         CloseDrawer();
     }
-    
+
     private async Task RemoveTask()
     {
         await HouseService.RemoveTaskAsync(_currentForm.Id, _connectedUser!.HomeId);
+        ToastService.Show("Tâche supprimée", ToastType.Warning);
         await LoadDataAsync();
         CloseDrawer();
     }
@@ -130,8 +141,17 @@ public partial class Home : ComponentBase
     {
         // task.IsDone is the state BEFORE toggle — false means it's being completed now
         await HouseService.ToggleTaskAsync(task.TaskId, task.IsDone, _connectedUser!.HomeId);
-        if (!task.IsDone) await TaskCompleted(task);
-        await UserService.UpdateTotalXpUser(_connectedUser.UserId);
+        if (!task.IsDone)
+        {
+            await TaskCompleted(task);
+            ToastService.Show($"Tâche complétée · +{task.XpToEarn} XP 🎉");
+        }
+        else
+        {
+            ToastService.Show("Tâche remise en attente", ToastType.Info);
+        }
+        await UserService.UpdateTotalXpUser(_connectedUser!.UserId);
+        _connectedUser = await UserService.GetAuthenticatedUserAsync();
         await LoadDataAsync();
     }
     

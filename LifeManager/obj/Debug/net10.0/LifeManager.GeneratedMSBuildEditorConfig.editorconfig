@@ -94,6 +94,10 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xUYXNrRHJhd2VyLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/wagner/Desktop/www/dotnet/LifeManager/LifeManager/Components/ToastContainer.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xUb2FzdENvbnRhaW5lci5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/wagner/Desktop/www/dotnet/LifeManager/LifeManager/Components/_Imports.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xfSW1wb3J0cy5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 

@@ -5,6 +5,23 @@ namespace LifeManager.Services;
 public class LevelingService
 {
     private readonly int[] _thresholds = { 0, 50, 75, 100, 150, 175, 200, 250, 275, 300, 325, 350, 375, 400 };
+    private readonly string[] _levelNames =
+    {
+        "Novice",
+        "Apprenti",
+        "Combattant",
+        "Initié",
+        "Aventurier",
+        "Combattant",
+        "Vétéran",
+        "Expert",
+        "Maître",
+        "Grand Maître",
+        "Champion",
+        "Légende",
+        "Mythique",
+        "Héros TDAH"
+    };
 
     public Task<UserLevelModel> CalculateLevelAsync(int totalXp)
     {
@@ -33,6 +50,6 @@ public class LevelingService
             }
         }
 
-        return Task.FromResult(new UserLevelModel(level, currentLevelXp, xpForNext));
+        return Task.FromResult(new UserLevelModel(level, currentLevelXp, xpForNext, _levelNames[level]));
     }
 }
